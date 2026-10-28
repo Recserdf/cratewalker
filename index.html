@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -11,13 +12,14 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<style>body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>html{background:#131313;color-scheme:dark}body{margin:0;background:#131313;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <script>
 window.CRATEWALK_STANDALONE = true;
 if ("serviceWorker" in navigator) addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
 </script>
 <title>Cratewalk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
@@ -69,10 +71,21 @@ if ("serviceWorker" in navigator) addEventListener("load", () => { navigator.ser
   --f-body: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --f-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --tab-h: 62px;
+  /* The phone's safe areas: the notch and clock at the top, the home bar at the bottom. On a Home Screen app the page
+     puts in the phone's own numbers when iOS reports none (fitScreen), so the game still clears both. */
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: min(env(safe-area-inset-bottom, 0px), 34px);
+  /* The tab bar sits low like an iPhone's own: its labels end just above the home bar, not a home bar's height above it. */
+  --tab-pad: max(calc(var(--sab) - 12px), 0px);
+  --kb: 0px;
   color-scheme: dark;
 }
 
-html, body { height: 100%; }
+/* The game is one fixed screen. The page itself never scrolls or bounces, so nothing can open a gap at an edge,
+   and the color behind everything is the game's own dark, so any bar iOS draws matches it. */
+html { background: var(--paper); overscroll-behavior: none; }
+html, body { touch-action: pan-x pan-y; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html, body { height: 100%; overflow: hidden; }
 body {
   background: var(--paper); color: var(--ink);
   font-family: var(--f-body); font-size: 14px; line-height: 1.45;
@@ -84,7 +97,7 @@ button { cursor: pointer; }
 a { color: var(--blue); }
 .num, .mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
 
-#app { position: fixed; inset: 0; overflow: hidden; background: var(--paper); }
+#app { position: fixed; inset: 0; overflow: hidden; overflow: clip; background: var(--paper); }
 #map { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: crosshair; }
 
 /* ---------- focus ---------- */
@@ -102,7 +115,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 /* ---------- HUD ---------- */
 .hud {
   position: absolute; top: 0; left: 0; right: 0; z-index: 6; pointer-events: none;
-  padding-top: calc(env(safe-area-inset-top, 0px) + 10px);
+  padding-top: calc(var(--sat) + 10px);
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
@@ -136,7 +149,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .map-ctrls {
   position: absolute; z-index: 5; display: grid; gap: 8px;
   right: max(16px, env(safe-area-inset-right, 0px));
-  bottom: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px) + 16px);
+  bottom: calc(var(--tab-h) + var(--tab-pad) + 16px);
 }
 .fab {
   width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center;
@@ -147,7 +160,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .has-dropcard .map-ctrls { display: none; }
 .inrange {
   position: absolute; z-index: 5; left: max(16px, env(safe-area-inset-left, 0px));
-  bottom: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px) + 16px);
+  bottom: calc(var(--tab-h) + var(--tab-pad) + 16px);
   border: 0; border-radius: 999px; padding: 10px 16px 10px 12px; min-height: 44px;
   background: var(--pink); color: var(--on-accent); font-weight: 800; box-shadow: var(--shadow-1);
   display: inline-flex; align-items: center; gap: 10px; max-width: calc(100% - 100px);
@@ -157,7 +170,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 /* ---------- drop card (non-modal) ---------- */
 .dropcard {
   position: absolute; z-index: 7; left: 0; right: 0; margin: 0 auto; max-width: 520px;
-  bottom: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px) + 12px);
+  bottom: calc(var(--tab-h) + var(--tab-pad) + 12px);
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 .dropcard-in {
@@ -205,7 +218,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .tabbar {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 20;
   background: var(--paper); border-top: 1px solid var(--line);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-bottom: var(--tab-pad);
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 .tabbar-in { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); }
@@ -224,15 +237,15 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 /* ---------- panels ---------- */
 .panel {
   position: absolute; left: 0; right: 0; top: 0; z-index: 10;
-  bottom: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px));
-  background: var(--paper); display: flex; flex-direction: column; overflow: hidden;
+  bottom: calc(var(--tab-h) + var(--tab-pad));
+  background: var(--paper); display: flex; flex-direction: column; overflow: hidden; overflow: clip;
   animation: slide-in .24s cubic-bezier(.2,.9,.25,1);
 }
 @media (min-width: 900px) {
   .panel { right: auto; width: 480px; border-right: 1px solid var(--line); box-shadow: var(--shadow-2); }
 }
 .panel-head {
-  padding-top: calc(env(safe-area-inset-top, 0px) + 16px); padding-bottom: 12px;
+  padding-top: calc(var(--sat) + 16px); padding-bottom: 12px;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
   border-bottom: 1px solid var(--line); background: var(--paper); display: grid; gap: 12px;
 }
@@ -247,9 +260,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 .section { display: grid; gap: 10px; margin-bottom: 26px; }
 /* ---------- Showcase: a dark case on your profile, three tall cards across ---------- */
-.showcase { container-type: inline-size; background: #1B1B1B; border-radius: 18px; padding: 17px 20px 20px; color: #FFFFFF; }
-.sc-head { display: flex; align-items: center; gap: 7px; min-height: 22px; margin-bottom: 15px; color: #9B9B9F; font: 600 16px/1.2 var(--f-body); }
-.sc-spark svg { width: 19px; height: 19px; display: block; }
+.showcase { container-type: inline-size; background: #1B1B1B; border-radius: 20px; padding: 0 20px 20px; color: #FFFFFF; }
+.sc-head { display: flex; align-items: center; gap: 5px; height: 51px; margin: 0 -5px 0 -3px; color: #848484; font: 600 16px/1.2 var(--f-body); }
+.sc-spark svg { width: 14px; height: 14px; display: block; }
 .sc-name { flex: 1; }
 .sc-count { color: #6F6F74; font-size: 12px; font-variant-numeric: tabular-nums; }
 .sc-empty { margin: 0; color: #9B9B9F; font-size: 14px; line-height: 1.45; }
@@ -288,7 +301,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .fchip .sw { width: 8px; height: 8px; border-radius: 50%; background: var(--rc, var(--ink-3)); }
 .input, .select {
   min-height: 40px; border-radius: 999px; border: 0; background: var(--paper-hi); color: var(--ink); padding-inline: 16px;
-  padding: 8px 12px; font-size: 14px; min-width: 0;
+  padding: 8px 12px; font-size: 16px; min-width: 0;
 }
 .input::placeholder { color: var(--ink-3); }
 .search { flex: 1; }
@@ -361,7 +374,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 /* ---------- framing your video: a fixed frame in the card's shape over the video, with a grid ---------- */
 .frame-ed {
   position: absolute; inset: 0; z-index: 90; display: flex; flex-direction: column; background: #0B0B0B; color: #FFFFFF; animation: fade .18s ease;
-  padding: max(8px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  padding: max(8px, var(--sat)) max(16px, env(safe-area-inset-right, 0px)) max(16px, var(--sab)) max(16px, env(safe-area-inset-left, 0px));
 }
 .fe-top { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; min-height: 52px; }
 .fe-top b { font: 700 16px/1.2 var(--f-body); }
@@ -411,8 +424,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .sheet-bg.tint img { filter: blur(var(--bg-blur)) brightness(.5) saturate(.6); }
 /* ---------- moving a save ---------- */
 .setting-save { flex-wrap: wrap; }
-.save-btns { flex-wrap: wrap; justify-content: flex-end; }
-.save-code { width: 100%; min-height: 140px; border-radius: 14px; padding: 12px 14px; resize: vertical; font: 500 12px/1.4 var(--f-mono); word-break: break-all; }
+.setting-save > div:first-child { flex: 1 1 100%; }
+.save-btns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; width: 100%; }
+.save-btns .btn { width: 100%; }
+.save-code { width: 100%; min-height: 120px; border-radius: 14px; padding: 12px 14px; resize: vertical; font: 500 16px/1.35 var(--f-mono); word-break: break-all; }
 /* ---------- username ---------- */
 .pname-row { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .pname-edit { flex: none; width: 32px; height: 32px; border: 0; border-radius: 50%; background: var(--raise); color: var(--ink-2); display: grid; place-items: center; }
@@ -495,7 +510,163 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .track.miss { color: var(--ink-2); }
 .qtoggle { border: 0; background: none; padding: 0; color: var(--blue); font-weight: 700; font-size: 12px; }
 
-/* ---------- profile ---------- */
+/* ---------- profile: SoundMap's profile page, measured on an iPhone 13 Pro Max (428 x 926) ----------
+   Page #131313, cards #1B1B1B with 20pt corners, 20pt side margins and 16pt between them; card headers 52pt tall;
+   a 72pt picture; songs with 69pt covers every 92pt; a 213 x 41 Offers button 45pt off the bottom. While it's open
+   the tab bar steps aside, like SoundMap's page. */
+#panel-me { bottom: 0; }
+#app.on-me .tabbar { visibility: hidden; opacity: 0; transition: opacity .18s ease, visibility 0s linear .18s; }
+.pf-panel { background: #131313; }
+.pf-bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: #131313; }
+.pf-bg > img, .pf-bg > video { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; display: block; }
+.pf-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.6) 0, rgba(0,0,0,.28) 24%, rgba(0,0,0,.34) 68%, rgba(0,0,0,.62) 100%); }
+.pf-bg:empty::after { content: none; }
+.pf-panel.has-bg .pf-card, .pf-panel.has-bg .showcase { background: rgba(27,27,27,.84); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+.pf-panel.has-bg .pf-tile { background: rgba(21,21,21,.8); }
+.pf-panel.has-bg .pf-name b { text-shadow: 0 1px 6px rgba(0,0,0,.55); }
+.pf-panel.has-bg .pf-line, .pf-panel.has-bg .pf-foot { color: #D2D2D2; text-shadow: 0 1px 4px rgba(0,0,0,.7); }
+.pf-panel.has-bg .pf-ava { box-shadow: 0 2px 10px rgba(0,0,0,.35); }
+.pf-top {
+  position: relative; z-index: 2; flex: none; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box;
+  height: calc(var(--sat) + 40px); padding: var(--sat) max(21px, env(safe-area-inset-right, 0px)) 0 max(12px, env(safe-area-inset-left, 0px));
+}
+.pf-back { appearance: none; width: 44px; height: 40px; padding: 0 0 0 7px; margin-top: 2px; border: 0; background: none; color: #FFFFFF; display: grid; place-items: center start; }
+.pf-back svg { width: 22px; height: 22px; display: block; margin-left: -2px; }
+.pf-actions { display: flex; align-items: center; gap: 7px; margin-top: 2px; }
+.pf-pill { appearance: none; height: 23.5px; padding: 0 11px; border: 0; border-radius: 999px; background: #1CD055; color: #000000; font: 800 13.5px/1 var(--f-body); white-space: nowrap; }
+.pf-more { appearance: none; width: 22.5px; height: 22.5px; padding: 0; border: 0; border-radius: 50%; background: #1B1B1B; color: #848484; display: grid; place-items: center; }
+.pf-more svg { width: 17px; height: 17px; display: block; }
+.pf-back:active, .pf-pill:active, .pf-more:active, .pf-offers:active { opacity: .6; }
+.pf-body { position: relative; z-index: 1; padding: 0 max(20px, env(safe-area-inset-right, 0px)) calc(var(--sab) + 120px) max(20px, env(safe-area-inset-left, 0px)); }
+.pf-body .section { margin-bottom: 16px; gap: 0; }
+.pf-head { display: flex; align-items: center; gap: 16px; padding: 13px 0; }
+.pf-ava { position: relative; width: 72px; height: 72px; flex: none; border-radius: 50%; overflow: hidden; background: #1B1B1B; display: grid; place-items: center; color: #FFFFFF; font: 800 30px/1 var(--f-body); }
+.pf-ava img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; }
+.pf-id { min-width: 0; display: grid; gap: 4px; }
+.pf-name { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.pf-name b { min-width: 0; font: 800 20px/1.2 var(--f-body); color: #FFFFFF; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pf-mini { width: 22px; height: 22px; flex: none; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 1.5px #F2C230; }
+.pf-line { display: flex; align-items: center; gap: 15px; color: #848484; font: 600 14px/1.2 var(--f-body); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pf-li { display: inline-flex; align-items: center; gap: 6px; }
+.pf-emo { font-size: 14px; line-height: 1; }
+.pf-li svg { width: 13px; height: 13px; display: block; }
+.pf-card { background: #1B1B1B; border-radius: 20px; margin-bottom: 16px; color: #FFFFFF; }
+.pf-ch { display: flex; align-items: center; gap: 5px; height: 52px; padding: 0 15px 0 17px; color: #848484; font: 600 16px/1.2 var(--f-body); }
+.pf-ch-i { flex: none; width: 14px; height: 14px; display: grid; place-items: center; font-size: 13px; line-height: 1; }
+.pf-ch-i svg { width: 14px; height: 14px; display: block; }
+.pf-ch-t { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+button.pf-ch, button.pf-fav, button.pf-pl { appearance: none; border: 0; width: 100%; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+button.pf-ch, button.pf-pl { background: none; }
+button.pf-ch { color: #848484; }
+button.pf-fav { background: #1B1B1B; }
+button.pf-ch:active, button.pf-fav:active, button.pf-pl:active { opacity: .7; }
+.pf-chev { flex: none; width: 9px; height: 14px; color: #848484; display: block; }
+.pf-see { appearance: none; border: 0; background: none; padding: 6px 2px 6px 8px; margin-right: -2px; color: #848484; font: 600 14px/1 var(--f-body); }
+.pf-ach { display: flex; align-items: center; justify-content: space-between; height: 34px; padding: 0 36px 18px 30px; box-sizing: content-box; }
+.pf-ach span { display: inline-flex; align-items: center; gap: 8px; font: 800 24px/1 var(--f-body); color: #FFFFFF; font-variant-numeric: tabular-nums; }
+.pf-ach .pf-emo { font-size: 21px; }
+.pf-badges { position: relative; height: 99px; padding-bottom: 20px; box-sizing: content-box; display: flex; justify-content: center; align-items: center; }
+.pf-badges { gap: 16px; cursor: pointer; }
+.pf-badges.many { justify-content: flex-start; overflow-x: auto; scrollbar-width: none; height: 119px; padding: 0 20px; box-sizing: border-box; }
+.pf-badges.many::-webkit-scrollbar { display: none; }
+/* ---------- artist badges: your picture, an outline that follows its shape, and effects ---------- */
+.bdg { position: relative; flex: none; display: inline-grid; place-items: center; width: 92px; height: 92px; isolation: isolate; }
+.bdg.mini { width: 22px; height: 22px; }
+.bdg > img { width: 100%; height: 100%; max-width: none; object-fit: contain; display: block; }
+.bdg.round > img { border-radius: 50%; object-fit: cover; }
+.bdg-holo {
+  position: absolute; inset: 0; pointer-events: none; mix-blend-mode: color-dodge; opacity: .6;
+  background: linear-gradient(115deg, transparent 0 32%, rgba(255,90,210,.7) 40%, rgba(90,225,255,.7) 48%, rgba(255,236,110,.7) 56%, transparent 64% 100%);
+  background-size: 320% 100%; animation: bdg-holo 3.2s linear infinite;
+  -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center;
+}
+.bdg.round .bdg-holo { border-radius: 50%; }
+@keyframes bdg-holo { from { background-position: 100% 0; } to { background-position: -40% 0; } }
+.bdg-spark { position: absolute; z-index: 1; width: 14px; height: 14px; color: #FFF6C8; filter: drop-shadow(0 0 4px rgba(255,236,150,.95)); transform: scale(0); animation: bdg-twinkle 2.4s ease-in-out infinite; }
+.bdg-spark svg { width: 100%; height: 100%; display: block; }
+.bdg-spark.s0 { top: -5px; right: 4px; }
+.bdg-spark.s1 { top: 30%; left: -9px; width: 10px; height: 10px; animation-delay: .6s; }
+.bdg-spark.s2 { bottom: 10px; right: -8px; width: 11px; height: 11px; animation-delay: 1.2s; }
+.bdg-spark.s3 { bottom: -6px; left: 24%; width: 9px; height: 9px; animation-delay: 1.8s; }
+@keyframes bdg-twinkle { 0%, 100% { transform: scale(0) rotate(0); opacity: 0; } 40% { transform: scale(1) rotate(45deg); opacity: 1; } 70% { transform: scale(.45) rotate(90deg); opacity: .7; } }
+.bdg.float { animation: bdg-float 3.4s ease-in-out infinite; }
+@keyframes bdg-float { 50% { transform: translateY(-5px); } }
+@media (prefers-reduced-motion: reduce) { .bdg-holo, .bdg.float { animation: none; } .bdg-spark { animation: none; transform: scale(.8); } }
+.pf-name .bdg.mini { margin-left: 2px; }
+.bdg-stage { height: 176px; border-radius: 20px; background: #1B1B1B; display: grid; place-items: center; }
+.bdg-stage .bdg { width: 124px; height: 124px; }
+.bdg-empty { color: var(--ink-2); font-weight: 600; }
+.bdg-field { display: grid; gap: 8px; }
+.bdg-opt .rar-dot { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.3); }
+.bdg-opt .rar-dot.hollow { background: transparent; box-shadow: inset 0 0 0 1.5px var(--ink-2); }
+.bdg-opt.on { background: var(--raise); box-shadow: inset 0 0 0 1.5px #FFFFFF; }
+.fx-opt { padding: 0 14px; }
+.fx-opt.on { color: #0D0D0D; background: #1CD055; box-shadow: none; }
+.gc-pick { display: flex; flex-wrap: wrap; gap: 12px; padding: 2px; }
+.gc-sw { width: 30px; height: 30px; padding: 0; border: 0; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 2px rgba(0,0,0,.25); }
+.gc-sw.on { box-shadow: 0 0 0 2px var(--paper-hi), 0 0 0 4px #FFFFFF; }
+.bdg-list { display: grid; }
+.bdg-row { display: flex; align-items: center; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.bdg-row:last-child { border-bottom: 0; }
+.bdg-row-prev { width: 64px; height: 64px; flex: none; display: grid; place-items: center; }
+.bdg-row-prev .bdg { width: 54px; height: 54px; }
+.bdg-row-info { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.bdg-row-info b { font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bdg-row-info span { font-size: 12px; color: var(--ink-2); }
+.bdg-row-acts { display: flex; align-items: center; gap: 8px; }
+.bdg-pin { width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%; background: var(--raise); color: var(--ink-3); font: 700 17px/1 var(--f-body); }
+.bdg-pin.on { color: #F2C230; background: color-mix(in srgb, #F2C230 18%, var(--raise)); }
+.pf-none { margin: 0; padding: 0 17px; color: #848484; font: 500 14px/1.4 var(--f-body); text-align: center; }
+.pf-fav { display: flex; align-items: center; gap: 5px; height: 57px; padding: 0 15px 0 17px; color: #848484; font: 600 16px/1.2 var(--f-body); }
+.pf-favs { display: flex; gap: 9px; margin-right: 15px; }
+.pf-favs img { width: 23px; height: 23px; border-radius: 50%; object-fit: cover; background: #2A2A2A; }
+/* Playlists on the profile: SoundMap's 69pt dark tiles, each with its name and song count beside it */
+.pf-pls { display: grid; gap: 14px; padding: 0 17px 20.5px 24px; }
+.pf-pl { display: flex; align-items: center; gap: 21px; padding: 0; min-width: 0; color: #FFFFFF; }
+.pf-tile { width: 69px; height: 69px; flex: none; border-radius: 4px; background: #151515; color: #FFFFFF; display: grid; place-items: center; overflow: hidden; }
+.pf-tile svg { width: 17px; height: 17px; }
+.pf-pl-info { min-width: 0; display: grid; gap: 4px; }
+.pf-pl-info b { font: 700 16px/1.2 var(--f-body); color: #FFFFFF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pf-pl-info span { font: 600 14px/1.2 var(--f-body); color: #848484; font-variant-numeric: tabular-nums; }
+.pf-pl-new .pf-tile svg { width: 22px; height: 22px; }
+.pf-coll { padding: 1px 0 0; }
+/* each song: cover top-aligned, words from 2pt below its top, one song every 92pt */
+.pf-coll .srow { margin-bottom: 17.85px; }
+.pf-coll .srow-main { align-items: flex-start; gap: 21px; padding: 0 0 0 25px; }
+.pf-coll .srow-info { gap: 0; padding-top: 2px; }
+.pf-coll .srow-thumb { width: 69px; height: 69px; }
+.pf-coll .srow-thumb > img { border-radius: 5px; }
+.pf-coll .srow-t { font: 700 17px/1.2 var(--f-body); }
+.pf-coll .srow-a { margin-top: 4px; color: #FFFFFF; font: 500 15px/1.25 var(--f-body); }
+.pf-coll .rchip { margin-top: 7px; }
+.pf-coll .srow-play { width: 44px; height: 69px; margin-right: 10px; color: #848388; align-self: center; }
+.pf-foot { margin: 4px 0 0; color: #848484; font: 500 13px/1.15 var(--f-body); text-align: center; }
+.pf-offers {
+  position: absolute; z-index: 3; left: 50%; bottom: calc(var(--sab) + 11px); width: 213px; height: 41px; margin-left: -106.5px;
+  border: 0; border-radius: 999px; background: #1CD055; color: #000000; font: 800 17px/1 var(--f-body);
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+}
+.pf-offers .badge { position: absolute; top: -5px; right: 14px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: #FF3B30; color: #FFFFFF; font: 800 11px/18px var(--f-body); text-align: center; }
+@media (min-width: 900px) { .pf-offers { left: 240px; } }
+/* editing your profile */
+.pe-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.pe-row:last-of-type { border-bottom: 0; }
+.pe-prev { flex: none; width: 56px; height: 56px; border-radius: 50%; overflow: hidden; background: #1B1B1B; display: grid; place-items: center; color: #FFFFFF; font: 800 22px/1 var(--f-body); position: relative; }
+.pe-prev.wide { width: 56px; height: 76px; border-radius: 10px; }
+.pe-prev > img, .pe-prev > video { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; }
+.pe-info { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.pe-info b { font-weight: 800; }
+.pe-info span { font-size: 12px; color: var(--ink-2); }
+.pe-acts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.pe-name { display: grid; gap: 8px; }
+.pe-name .row .input { flex: 1; }
+.pf-artists { display: grid; gap: 4px; }
+.pf-artist { display: flex; align-items: center; gap: 12px; padding: 6px 0; }
+.pf-artist img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; background: #2A2A2A; }
+.pf-artist b { flex: 1; min-width: 0; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pf-artist span { color: var(--ink-2); font: 600 13px/1 var(--f-body); font-variant-numeric: tabular-nums; }
+
+/* ---------- profile (older pieces, used in the Achievements sheet) ---------- */
 .profile { display: grid; grid-template-columns: 76px 1fr; gap: 14px; align-items: center; }
 .pava { width: 76px; height: 76px; border-radius: 50%; object-fit: cover; background: var(--line); border: 3px solid var(--paper-hi); box-shadow: 0 0 0 3px var(--blue), 4px 4px 0 3px var(--pink); }
 .pname { font: 800 26px/1.1 var(--f-display); overflow-wrap: anywhere; }
@@ -528,11 +699,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   position: absolute; left: 0; right: 0; bottom: 0; max-height: 90%;
   background: var(--paper-hi); border-radius: 22px 22px 0 0; box-shadow: var(--shadow-2);
   display: flex; flex-direction: column; animation: rise .3s cubic-bezier(.2,.9,.25,1);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-bottom: var(--sab);
 }
 @media (min-width: 720px) {
   .sheet { left: 50%; right: auto; width: 500px; margin-left: -250px; bottom: 24px; border-radius: 22px; max-height: calc(100% - 48px); }
 }
+/* While you type, the game holds still and the open sheet rides just above the keyboard (holdStill). */
+#app.kb-open .sheet:not(.epic), #app.kb-open .epic-opts-panel { bottom: var(--kb); padding-bottom: 0; max-height: calc(100% - var(--kb) - var(--sat) - 8px); animation: none; transition: bottom .18s ease; }
 .sheet-grab { display: flex; justify-content: center; padding: 10px 0 4px; }
 .sheet-grab i { width: 40px; height: 5px; border-radius: 3px; background: var(--line); }
 .sheet-close { position: absolute; top: 10px; right: max(12px, env(safe-area-inset-right, 0px)); width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line); background: var(--paper-hi); display: grid; place-items: center; z-index: 2; }
@@ -625,10 +798,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .sheet.epic .sheet-grab, .sheet.epic .sheet-close { display: none; }
 .sheet.epic .sheet-body {
   position: relative; z-index: 1; flex: 1; gap: 14px;
-  padding: max(8px, env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px));
+  padding: max(8px, var(--sat)) max(20px, env(safe-area-inset-right, 0px)) max(24px, var(--sab)) max(20px, env(safe-area-inset-left, 0px));
 }
 .sheet.epic.clean .sheet-body { display: block; padding: 0; overflow: hidden; }
-.sheet.epic.clean .epic-top { position: absolute; z-index: 3; top: 0; left: 0; right: 0; padding: max(8px, env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) 0 max(20px, env(safe-area-inset-left, 0px)); }
+.sheet.epic.clean .epic-top { position: absolute; z-index: 3; top: 0; left: 0; right: 0; padding: max(8px, var(--sat)) max(20px, env(safe-area-inset-right, 0px)) 0 max(20px, env(safe-area-inset-left, 0px)); }
 .sheet.epic.clean .epic-stage { position: absolute; inset: 0; padding: 0 max(20px, env(safe-area-inset-right, 0px)) 0 max(20px, env(safe-area-inset-left, 0px)); }
 .sheet.epic .btn-row > .btn { flex: 1 1 auto; border-radius: 999px; white-space: nowrap; }
 /* Behind the page: the picture fills the screen, slightly blurred and dimmed. The blur grows with the screen
@@ -649,7 +822,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .epic-top .epic-icon:last-child:not(.epic-back) { margin-right: -14px; }
 .epic-stage { container-type: size; display: grid; place-items: center; min-height: 0; }
 .hero { position: relative; width: min(100%, calc((100dvh - 280px) * 9 / 14)); min-width: min(100%, 260px); justify-self: center; margin: clamp(10px, 4.5dvh, 48px) 0 clamp(8px, 2.5dvh, 28px); }
-.epic-stage .hero { --hw: min(100cqw, calc((100cqh - 2 * max(64px, env(safe-area-inset-top, 0px) + 60px)) * 9 / 14)); width: var(--hw); min-width: 0; margin: 0; }
+/* SoundMap's proportions: the card is as wide as the screen allows with 20px margins (387 of 428 on an iPhone 13
+   Pro Max), centered on the screen, and moved down only as far as it must be to clear the top bar. */
+.epic-stage .hero {
+  --top: calc(max(8px, var(--sat)) + 56px); --bot: max(20px, calc(var(--sab) + 12px));
+  --hw: min(100cqw, calc((100cqh - var(--top) - var(--bot)) * 9 / 14));
+  width: var(--hw); min-width: 0; align-self: start; margin: max(var(--top), calc((100cqh - var(--hw) * 14 / 9) / 2)) 0 0;
+}
 .epic-stage .hero-card { border-radius: calc(var(--hw) * .112); }
 .hero-aura { position: absolute; inset: -52px; z-index: 0; overflow: hidden; pointer-events: none; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-size: 100% 100%; mask-size: 100% 100%; }
 .hero-spin { position: absolute; left: 50%; top: 50%; width: 200%; height: auto; aspect-ratio: 1 / 1; margin: -100% 0 0 -100%; max-width: none; animation: aura-spin 10.4s linear infinite; will-change: transform; }
@@ -696,7 +875,7 @@ button.scard:active, .lrow:active { opacity: .5; transition: none; }
 /* the Options panel slides up over the Epic page */
 .epic-opts { position: absolute; inset: 0; z-index: 6; }
 .epic-opts-scrim { position: absolute; inset: 0; background: rgba(0,0,0,.52); animation: fade .2s ease; }
-.epic-opts-panel { position: absolute; left: 0; right: 0; bottom: 0; max-height: 86%; display: flex; flex-direction: column; background: #1C1C1F; border-radius: 22px 22px 0 0; box-shadow: 0 -12px 40px rgba(0,0,0,.5); animation: rise .28s cubic-bezier(.2,.9,.25,1); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.epic-opts-panel { position: absolute; left: 0; right: 0; bottom: 0; max-height: 86%; display: flex; flex-direction: column; background: #1C1C1F; border-radius: 22px 22px 0 0; box-shadow: 0 -12px 40px rgba(0,0,0,.5); animation: rise .28s cubic-bezier(.2,.9,.25,1); padding-bottom: var(--sab); }
 .epic-opts-panel:focus { outline: none; }
 @media (min-width: 720px) { .epic-opts-panel { left: 50%; right: auto; width: 520px; margin-left: -260px; bottom: 24px; border-radius: 22px; max-height: calc(100% - 48px); } }
 .epic-opts-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 14px 4px 20px; }
@@ -719,7 +898,7 @@ button.scard:active, .lrow:active { opacity: .5; transition: none; }
 .cv-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .cv-top {
   position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; gap: 12px;
-  padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
+  padding-top: calc(var(--sat) + 12px);
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 .cv-chip { font: 600 12px/1 var(--f-mono); letter-spacing: .08em; color: #FFFFFF; background: rgba(0,0,0,.4); padding: 8px 10px; border-radius: 999px; }
@@ -727,7 +906,7 @@ button.scard:active, .lrow:active { opacity: .5; transition: none; }
 .cv-btn svg { width: 18px; height: 18px; }
 .cv-bottom {
   position: absolute; left: 0; right: 0; bottom: 0; display: grid; gap: 10px; color: #FFFFFF;
-  padding-top: 90px; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 22px);
+  padding-top: 90px; padding-bottom: calc(var(--sab) + 22px);
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
   background: linear-gradient(to top, rgba(0,0,0,.78), rgba(0,0,0,0));
 }
@@ -739,7 +918,7 @@ button.scard:active, .lrow:active { opacity: .5; transition: none; }
 /* ---------- toasts ---------- */
 .toasts {
   position: absolute; z-index: 60; left: 0; right: 0; pointer-events: none; display: grid; justify-items: center; gap: 8px;
-  top: calc(env(safe-area-inset-top, 0px) + 62px);
+  top: calc(var(--sat) + 62px);
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 .toast {
@@ -767,6 +946,99 @@ button.scard:active, .lrow:active { opacity: .5; transition: none; }
 .ob-dots i.on { background: var(--pink); width: 22px; border-radius: 4px; }
 .ob-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .rarity-row { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* ---------- playlists: covers, pages, adding songs ---------- */
+.pl-cover { position: relative; flex: none; display: grid; place-items: center; overflow: hidden; background: #151515; color: #FFFFFF; }
+.pl-cover > img { width: 100%; height: 100%; max-width: none; object-fit: cover; display: block; }
+.pl-cover.quad { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; place-items: stretch; gap: 0; }
+.pl-cover.sm { width: 48px; height: 48px; border-radius: 5px; }
+.pl-cover.sm svg { width: 15px; height: 15px; }
+.pl-cover.opt { width: 56px; height: 56px; border-radius: 6px; }
+.pl-cover.opt svg { width: 17px; height: 17px; }
+.pl-cover.big { width: min(232px, 60vw); height: min(232px, 60vw); justify-self: center; border-radius: 8px; background: #1B1B1B; box-shadow: 0 16px 40px rgba(0,0,0,.55); }
+.pl-cover.big.blank svg { width: 25%; height: 25%; color: #848484; }
+/* A playlist's page: full screen like the profile; the bar on top stays put and fills in once you scroll past the header */
+.sheet.epic[data-page="pl"] { background: #131313; }
+.sheet.epic[data-page="pl"] .sheet-body { display: block; padding: 0 max(20px, env(safe-area-inset-right, 0px)) calc(var(--sab) + 40px) max(20px, env(safe-area-inset-left, 0px)); }
+@media (min-width: 720px) {
+  .sheet.epic[data-page="pl"] { left: 50%; right: auto; width: 560px; margin-left: -280px; box-shadow: 0 0 0 1px #222222, -12px 0 36px rgba(0,0,0,.35); }
+}
+.pl-top { position: sticky; top: 0; z-index: 4; display: grid; grid-template-columns: 64px minmax(0, 1fr) 64px; align-items: center; box-sizing: border-box;
+  height: calc(var(--sat) + 44px); padding: var(--sat) 20px 0 8px; margin: 0 -20px; transition: background-color .2s ease, box-shadow .2s ease; }
+.pl-top.solid { background: rgba(19,19,19,.94); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: 0 1px 0 rgba(255,255,255,.06); }
+.pl-top .pf-back { margin-top: 0; }
+.pl-top-t { min-width: 0; text-align: center; font: 700 16px/1.2 var(--f-body); color: #FFFFFF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0; transition: opacity .2s ease; }
+.pl-top.solid .pl-top-t { opacity: 1; }
+.pl-top-r { justify-self: end; display: flex; align-items: center; gap: 7px; }
+.pf-more.pl-more { width: 30px; height: 30px; color: #FFFFFF; background: rgba(255,255,255,.12); }
+.pf-more.pl-more svg { width: 18px; height: 18px; }
+.pl-glow { position: absolute; z-index: 0; top: 0; left: 0; right: 0; height: 470px; overflow: hidden; pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, #000 0, rgba(0,0,0,.8) 45%, transparent 100%); mask-image: linear-gradient(180deg, #000 0, rgba(0,0,0,.8) 45%, transparent 100%); }
+.pl-glow img { position: absolute; left: -20%; top: -20%; width: 140%; height: 140%; max-width: none; object-fit: cover; filter: blur(44px) saturate(1.4) brightness(.55); }
+.pl-head, .pl-acts, .pl-songs, .pl-foot, .pl-h1, .pl-all { position: relative; z-index: 1; }
+.pl-head { display: grid; justify-items: start; padding-top: 6px; }
+.pl-name { margin: 22px 0 0; font: 800 26px/1.15 var(--f-body); letter-spacing: -.01em; color: #FFFFFF; overflow-wrap: anywhere; }
+.pl-by { display: flex; align-items: center; gap: 7px; margin-top: 9px; color: #B3B3B3; font: 600 14px/1.2 var(--f-body); font-variant-numeric: tabular-nums; }
+.pl-ava { width: 22px; height: 22px; flex: none; border-radius: 50%; overflow: hidden; background: #2A2A2A; display: grid; place-items: center; color: #FFFFFF; font: 800 11px/1 var(--f-body); position: relative; }
+.pl-ava img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; }
+.pl-by b { color: #FFFFFF; font-weight: 700; }
+.pl-acts { display: flex; align-items: center; gap: 10px; margin: 18px 0 8px; }
+.pl-btn { appearance: none; display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 17px; border: 0; border-radius: 999px; background: #262626; color: #FFFFFF; font: 700 14px/1 var(--f-body); -webkit-tap-highlight-color: transparent; }
+.pl-btn.pl-add { background: #1CD055; color: #000000; padding-left: 13px; }
+.pl-btn-i svg { width: 17px; height: 17px; display: block; }
+.pl-btn.on { background: #FFFFFF; color: #000000; }
+.pl-btn:active { opacity: .7; }
+.pl-songs .srow-main { gap: 14px; padding: 8px 4px 8px 0; }
+.pl-songs .srow-thumb { width: 56px; height: 56px; }
+.pl-songs .srow-thumb > img { border-radius: 5px; }
+.pl-songs .srow-play { width: 44px; height: 56px; margin-right: -10px; }
+.pl-songs.editing { -webkit-user-select: none; user-select: none; }
+.pl-row { transition: transform .18s ease; }
+/* long playlists stay quick: rows out of view aren't drawn (an Epic's chip keeps changing color) */
+.pl-row { content-visibility: auto; contain-intrinsic-size: auto 85px; }
+.pl-pick { content-visibility: auto; contain-intrinsic-size: auto 62px; }
+.pl-row.dragging { transition: none; z-index: 3; background: #232323; border-radius: 10px; box-shadow: 0 12px 30px rgba(0,0,0,.55); }
+.pl-row.gone .srow-thumb { opacity: .45; }
+.rchip.gone { --rc: #9A9A9A; }
+.pl-rm, .pl-grip { appearance: none; flex: none; padding: 0; border: 0; background: none; display: grid; place-items: center; -webkit-tap-highlight-color: transparent; }
+.pl-rm { width: 38px; height: 56px; margin-left: -8px; }
+.pl-rm svg { width: 22px; height: 22px; }
+.pl-grip { width: 48px; height: 56px; margin-right: -12px; color: #848484; touch-action: none; cursor: grab; }
+.pl-grip svg { width: 22px; height: 22px; }
+.pl-rm:active { opacity: .5; }
+.pl-foot { display: grid; gap: 14px; margin-top: 18px; }
+.pl-foot .btn { justify-self: stretch; }
+.pl-empty { display: grid; gap: 4px; margin: 0; padding: 22px 0 4px; text-align: center; color: #848484; font: 500 14px/1.4 var(--f-body); }
+.pl-empty b { color: #FFFFFF; font: 700 17px/1.2 var(--f-body); }
+.btn.pl-del { color: #FF5A5F; }
+.btn.pl-del.confirming { color: #FFFFFF; }
+.pl-h1 { margin: 6px 0 20px; font: 800 30px/1.1 var(--f-body); letter-spacing: -.01em; color: #FFFFFF; }
+.pf-pls.pl-all { padding: 0 0 20px; gap: 16px; }
+.pl-all .pf-tile { background: #1F1F1F; }
+/* fields in a sheet that rises from the bottom stand out from it */
+.sheet:not(.epic) .input, .sheet:not(.epic) .select { background: var(--raise); }
+/* moving between pages that are already open */
+#sheetBody.nav-fwd { animation: nav-fwd .26s cubic-bezier(.2, .7, 0, 1); }
+#sheetBody.nav-back { animation: nav-back .26s cubic-bezier(.2, .7, 0, 1); }
+@keyframes nav-fwd { from { transform: translateX(44px); opacity: .25; } }
+@keyframes nav-back { from { transform: translateX(-44px); opacity: .25; } }
+/* adding songs, and a card's Add to playlist */
+.pl-addwrap { display: block; }
+.pl-search { position: sticky; top: 0; z-index: 2; display: grid; gap: 8px; margin: -10px -20px 4px; padding: 10px 20px 10px; background: #1C1C1F; }
+.pl-count { color: var(--ink-2); font: 600 13px/1.2 var(--f-body); font-variant-numeric: tabular-nums; }
+.pl-picks { display: grid; }
+.pl-pick { appearance: none; display: flex; align-items: center; gap: 12px; width: 100%; min-width: 0; padding: 7px 0; border: 0; background: none; color: inherit; text-align: left; -webkit-tap-highlight-color: transparent; }
+.pl-pick:active { opacity: .6; }
+.pl-pick-art { width: 48px; height: 48px; flex: none; border-radius: 5px; overflow: hidden; background: #262626; }
+.pl-pick-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pl-pick-info { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.pl-pick-info b { font: 700 15px/1.25 var(--f-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pl-pick-info span { color: var(--ink-2); font: 500 13px/1.25 var(--f-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+.pl-tick { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: #FFFFFF; box-shadow: inset 0 0 0 2px #5A5A5A; }
+.pl-tick svg { width: 15px; height: 15px; }
+.pl-pick.on .pl-tick { background: #1CD055; color: #000000; box-shadow: none; }
+.pl-choose { display: grid; gap: 8px; }
+.pl-quick { display: grid; gap: 6px; margin-top: 4px; }
 
 @keyframes rise { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes slide-in { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
@@ -841,11 +1113,18 @@ button.scard:active, .lrow:active { opacity: .5; transition: none; }
     <div class="panel-body" id="questsBody"></div>
   </section>
 
-  <section class="panel" id="panel-me" hidden aria-label="Profile">
-    <header class="panel-head">
-      <div class="ph-top"><h1 class="display misreg panel-title">Profile</h1><div class="ph-meta" id="meMeta"></div></div>
+  <section class="panel pf-panel" id="panel-me" hidden aria-label="Profile">
+    <div class="pf-bg" id="pfBg" aria-hidden="true"></div>
+    <header class="pf-top">
+      <h1 class="sr">Profile</h1>
+      <button class="pf-back" id="pfBack" type="button" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4.5 7.5 12l7.5 7.5"/></svg></button>
+      <div class="pf-actions">
+        <button class="pf-pill" id="pfEdit" type="button">Edit profile</button>
+        <button class="pf-more" id="pfMore" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="12" r="1.9" fill="currentColor"/><circle cx="12" cy="12" r="1.9" fill="currentColor"/><circle cx="18.5" cy="12" r="1.9" fill="currentColor"/></svg></button>
+      </div>
     </header>
-    <div class="panel-body" id="meBody"></div>
+    <div class="panel-body pf-body" id="meBody"></div>
+    <button class="pf-offers" id="pfOffers" type="button">Offers<span class="badge" id="badgeOffers" hidden></span></button>
   </section>
 
   <nav class="tabbar" aria-label="Sections">
@@ -1229,6 +1508,13 @@ const rarityOf = c => validRarity(c.r) ? c.r : naturalRarity(c);
 const AURA_NAMES = ["Green", "Purple", "Amber", "Silver", "Rainbow"];
 const auraOf = c => validRarity(c.a) ? c.a : rarityOf(c);
 const cleanName = v => typeof v === "string" ? v.replace(/[\u0000-\u001f\u007f]/g, "").replace(/\s+/g, " ").trim().slice(0, 20) : "";
+const cleanText = (v, n) => typeof v === "string" ? v.replace(/[\u0000-\u001f\u007f]/g, "").replace(/\s+/g, " ").trim().slice(0, n) : "";
+// Artist badges you make: an id like "b" + letters and digits; up to 12; one outline; any of the effects.
+const BADGE_ID = /^b[a-z0-9]{6,16}$/, BADGE_MAX = 12;
+const BADGE_OUTLINES = ["white", "gold", "black", "none"], BADGE_FX = ["glow", "holo", "sparkle", "float"];
+// Playlists you make: an id like "p" + letters and digits, a name, and songs in your order. Your save keeps each
+// song as its catalog number in base 36 ("1f,a3,vo"), so even long playlists take little room in it.
+const PL_ID = /^p[a-z0-9]{6,16}$/, PL_MAX = 40, PL_SONGS = 500, PL_TOTAL = 4000, PL_NAME = 40;
 function baseValue(k, v) {
   const s = SONG_BY_KEY.get(k), hv = rnd01(k + "|val");
   if (v === 2) return 4000 + 2000 * hv;
@@ -1365,7 +1651,7 @@ function newState() {
     medals: [], settled: {}, escrow: {}, escrowCards: {}, listings: [],
     houseBought: {}, houseNeg: {}, houseOffers: {}, counts: {}, epicsLocal: {}, featured: [], gifts: {}, covers: {}, backdrops: {}, videos: {}, music: {}, vframe: {},
     starter: { done: false, k: SONGS[BY_TIER[1][Math.floor(Math.random() * BY_TIER[1].length)]].key },
-    onboarded: false, sound: true, created: now(), username: "",
+    onboarded: false, sound: true, created: now(), username: "", profile: {}, badges: [], badgeImgs: {}, playlists: [], plImgs: {},
   };
 }
 // A vault Epic exactly as the vault gave it.
@@ -1404,6 +1690,8 @@ function packState(s) {
   }
   const out = clone({ ...s, cards: kept });
   out.giftEpics = [...groups].map(([t, list]) => ({ t, r: toRanges([...new Set(list)].sort((a, b) => a - b)) }));
+  out.playlists = (s.playlists || []).map(p => ({ id: p.id, name: p.name, t: p.t, u: p.u,
+    s: p.songs.filter(k => SONG_BY_KEY.has(k)).map(k => SONG_BY_KEY.get(k).i.toString(36)).join(",") }));
   return out;
 }
 const validAssetId = id => typeof id === "string" && /^[A-Za-z0-9_.~-]{1,128}$/.test(id);
@@ -1472,6 +1760,44 @@ function sanitizeState(raw) {
   if (raw.starter && typeof raw.starter === "object") s.starter = { done: !!raw.starter.done, k: SONG_BY_KEY.has(raw.starter.k) ? raw.starter.k : s.starter.k };
   s.onboarded = !!raw.onboarded; s.sound = raw.sound !== false; s.created = num(raw.created, now());
   s.username = cleanName(raw.username);
+  // Your own artist badges: a picture (kept like a cover, under the badge's id) with an outline and effects.
+  s.badges = (Array.isArray(raw.badges) ? raw.badges : []).filter(b => b && typeof b.id === "string" && BADGE_ID.test(b.id))
+    .slice(0, BADGE_MAX).map(b => ({
+      id: b.id, name: cleanText(b.name, 40), ol: BADGE_OUTLINES.includes(b.ol) ? b.ol : "white",
+      fx: Array.isArray(b.fx) ? [...new Set(b.fx.filter(f => BADGE_FX.includes(f)))] : [],
+      gc: typeof b.gc === "string" && /^#[0-9a-f]{6}$/i.test(b.gc) ? b.gc : "#1CD055", pin: !!b.pin, cut: !!b.cut,
+    }));
+  for (const [k, v] of Object.entries(obj(raw.badgeImgs))) {
+    if (!s.badges.some(b => b.id === k) || !v || !validAssetId(v.id)) continue;
+    s.badgeImgs[k] = { id: v.id, t: num(v.t, now()) };
+    if (typeof v.m === "string" && /^image\/[\w.+-]{1,40}$/.test(v.m)) s.badgeImgs[k].m = v.m;
+  }
+  // Your playlists: songs come back from their catalog numbers (or as song keys), each song once, in your order.
+  const plIds = new Set();
+  let plRoom = PL_TOTAL;
+  s.playlists = [];
+  for (const p of Array.isArray(raw.playlists) ? raw.playlists : []) {
+    if (s.playlists.length >= PL_MAX) break;
+    if (!p || typeof p.id !== "string" || !PL_ID.test(p.id) || plIds.has(p.id)) continue;
+    plIds.add(p.id);
+    const list = typeof p.s === "string" ? p.s.split(",").map(x => /^[0-9a-z]{1,4}$/.test(x) ? SONGS[parseInt(x, 36)] : null).filter(Boolean).map(x => x.key)
+      : Array.isArray(p.songs) ? p.songs.filter(k => typeof k === "string" && SONG_BY_KEY.has(k)) : [];
+    const songs = [...new Set(list)].slice(0, Math.max(0, Math.min(PL_SONGS, plRoom)));
+    plRoom -= songs.length;
+    const t = num(p.t, now());
+    s.playlists.push({ id: p.id, name: cleanText(p.name, PL_NAME) || "My playlist", songs, t, u: num(p.u, t) });
+  }
+  for (const [k, v] of Object.entries(obj(raw.plImgs))) {
+    if (!plIds.has(k) || !s.playlists.some(p => p.id === k) || !v || !validAssetId(v.id)) continue;
+    s.plImgs[k] = { id: v.id, t: num(v.t, now()) };
+    if (typeof v.m === "string" && /^image\/[\w.+-]{1,40}$/.test(v.m)) s.plImgs[k].m = v.m;
+  }
+  // Your profile's background (a GIF, photo or video) and picture, kept in the asset store; m is the file type.
+  for (const [k, v] of Object.entries(obj(raw.profile))) {
+    if ((k !== "bg" && k !== "avatar") || !v || !validAssetId(v.id)) continue;
+    s.profile[k] = { id: v.id, t: num(v.t, now()) };
+    if (typeof v.m === "string" && /^(image|video)\/[\w.+-]{1,40}$/.test(v.m)) s.profile[k].m = v.m;
+  }
   return s;
 }
 function loadLocal() {
@@ -3372,31 +3698,35 @@ function findPlaylistUrl(v, depth) {
   if (typeof v === "object") { for (const k in v) { const u = findPlaylistUrl(v[k], depth + 1); if (u) return u; } }
   return "";
 }
+// Makes a playlist in your Spotify with these songs, under the name you give it. Resolves { url, msg };
+// when it can't, rejects with { msg } saying why.
+async function spotifyPlaylist(name, keys) {
+  const songs = keys.map(k => SONG_BY_KEY.get(k)).filter(Boolean);
+  const prompt = `Make a playlist called ${name} with exactly these ${songs.length} songs: ` + songs.map(s => `${s.title} by ${s.artist}`).join("; ") + ".";
+  let res;
+  try { res = await mcpCap.callTool(SPOTIFY, "generate_playlist", { prompt, language: "en-US" }); }
+  catch (e) {
+    const code = e && e.code;
+    throw { msg: code === "server_unavailable" || code === "upstream_error"
+      ? "Spotify didn't answer. The playlist may have been made anyway, so check Spotify before trying again."
+      : spotifyError(e) };
+  }
+  spotifyPerm = "granted";
+  const body = res && res.payload !== undefined ? res.payload : res && res.content;
+  if (/NOT_SUBSCRIBED|PREMIUM_REQUIRED/i.test(JSON.stringify(body || ""))) throw { msg: "Making playlists needs Spotify Premium. Playing and saving songs from any card still works." };
+  const url = findPlaylistUrl(body);
+  return { url, msg: url ? "Your playlist is ready." : "Your playlist is ready in your Spotify library." };
+}
 async function makeCratePlaylist(keys) {
   if (playlistUI.status === "working" || !mcpCap) return;
   Object.assign(playlistUI, { status: "working", msg: "", url: "" });
   renderCrate();
-  const songs = keys.map(k => SONG_BY_KEY.get(k)).filter(Boolean);
-  const prompt = `Make a playlist called Cratewalk Crate with exactly these ${songs.length} songs: ` + songs.map(s => `${s.title} by ${s.artist}`).join("; ") + ".";
   try {
-    const res = await mcpCap.callTool(SPOTIFY, "generate_playlist", { prompt, language: "en-US" });
-    spotifyPerm = "granted";
-    const body = res && res.payload !== undefined ? res.payload : res && res.content;
-    if (/NOT_SUBSCRIBED|PREMIUM_REQUIRED/i.test(JSON.stringify(body || ""))) {
-      Object.assign(playlistUI, { status: "error", msg: "Making playlists needs Spotify Premium. Playing and saving songs from any card still works." });
-    } else {
-      const url = findPlaylistUrl(body);
-      Object.assign(playlistUI, { status: "done", url, msg: url ? "Your playlist is ready." : "Your playlist is ready in your Spotify library." });
-      toast("Spotify playlist made", "good");
-    }
+    const r = await spotifyPlaylist("Cratewalk Crate", keys);
+    Object.assign(playlistUI, { status: "done", url: r.url, msg: r.msg });
+    toast("Spotify playlist made", "good");
   } catch (e) {
-    const code = e && e.code;
-    Object.assign(playlistUI, {
-      status: "error",
-      msg: code === "server_unavailable" || code === "upstream_error"
-        ? "Spotify didn't answer. The playlist may have been made anyway, so check Spotify before trying again."
-        : spotifyError(e),
-    });
+    Object.assign(playlistUI, { status: "error", msg: (e && e.msg) || "Spotify didn't answer. Try again in a moment." });
   }
   renderCrate();
 }
@@ -3430,17 +3760,24 @@ const VIDEO_MAX = 20 * 1024 * 1024, VIDEO_SECONDS = 30, MUSIC_SECONDS = 30;
 // under that. Up to five part ids pack into the one id field (see packIds): about 99 MB in all.
 const PART_BYTES = VIDEO_MAX - 256 * 1024, VIDEO_PARTS = 5, FULL_MAX = PART_BYTES * VIDEO_PARTS;
 const AUDIO_BPS = 160000;
-// On this device a background shares the covers store, under "bg|" and the song's key.
+// On this device a background shares the covers store, under "bg|" and the song's key. Your profile's
+// background and picture are kept there too, under "profile|bg" and "profile|avatar", and so are badge pictures
+// ("badge|" and the badge's id) and playlist covers ("pl|" and the playlist's id).
 const MEDIA = {
   cover: { field: "covers", store: "covers" }, video: { field: "videos", store: "videos" }, music: { field: "music", store: "music" },
   bg: { field: "backdrops", store: "covers", prefix: "bg|" },
+  pbg: { field: "profile", store: "covers", prefix: "profile|", only: "bg" },
+  pava: { field: "profile", store: "covers", prefix: "profile|", only: "avatar" },
+  badge: { field: "badgeImgs", store: "covers", prefix: "badge|", ok: k => BADGE_ID.test(k) },
+  plc: { field: "plImgs", store: "covers", prefix: "pl|", ok: k => PL_ID.test(k) },
 };
 const deviceKey = (kind, k) => (MEDIA[kind].prefix || "") + k;
 const MEDIA_HINT = "Your cover is the still image on the card. Your video and music play when you open it.";
 const QUALITY_TEXT = { full: "full quality", hq: "high-quality copy", light: "smaller copy" };
 let assetsCap = null, assetsP = Promise.resolve(null), activeJob = null, stopPreview = null;
 const assetUrlById = new Map();                                              // display URLs from uploads made during this visit
-const localMedia = { cover: new Map(), video: new Map(), music: new Map(), bg: new Map() }; // song key -> blob: URL kept on this device
+const localMedia = { cover: new Map(), video: new Map(), music: new Map(), bg: new Map(), pbg: new Map(), pava: new Map(), badge: new Map(), plc: new Map() }; // key -> blob: URL kept on this device
+const localTypes = new Map();   // device key -> the file's type, so a profile background knows if it's a video
 let videoSound = true;
 try { videoSound = localStorage.getItem("cratewalk.videoSound") !== "off"; } catch { /* sound on by default */ }
 Object.assign(ICON, {
@@ -3558,10 +3895,12 @@ async function loadLocalMedia() {
     for (const [key, blob] of pairs) {
       if (typeof key !== "string" || !(blob instanceof Blob) || (pre && !key.startsWith(pre))) continue;
       const k = key.slice(pre.length);
-      if (!SONG_BY_KEY.has(k)) continue;
+      const M = MEDIA[kind];
+      if (M.ok ? !M.ok(k) : M.only ? k !== M.only : !SONG_BY_KEY.has(k)) continue;
       const old = localMedia[kind].get(k);
       if (old) URL.revokeObjectURL(old);
       localMedia[kind].set(k, URL.createObjectURL(blob));
+      localTypes.set(key, blob.type || "");
       changed = true;
     }
   }
@@ -3571,6 +3910,7 @@ function forgetDeviceMedia(kind, k) {
   const u = localMedia[kind].get(k);
   if (u) URL.revokeObjectURL(u);
   localMedia[kind].delete(k);
+  localTypes.delete(deviceKey(kind, k));
   deviceMedia(kind, "readwrite", st => st.delete(deviceKey(kind, k))).catch(() => {});
 }
 
@@ -3580,6 +3920,7 @@ async function saveMedia(kind, k, blob, type, say, extra) {
   const field = MEDIA[kind].field, isVideo = kind === "video";
   const meta = extra && Number.isFinite(extra.d) && extra.d > 0 ? { d: Math.round(extra.d * 10) / 10 } : {};
   if (isVideo && extra && QUALITY_TEXT[extra.q]) meta.q = extra.q;
+  if (extra && typeof extra.m === "string") meta.m = extra.m;
   const onProgress = (extra && extra.onProgress) || (() => {});
   if (isVideo && blob.size > FULL_MAX) throw { code: "too_large" };
   let assets = await assetsP;
@@ -3619,6 +3960,7 @@ async function saveMedia(kind, k, blob, type, say, extra) {
   const old = localMedia[kind].get(k);
   if (old) URL.revokeObjectURL(old);
   localMedia[kind].set(k, URL.createObjectURL(blob));
+  localTypes.set(deviceKey(kind, k), blob.type || type || "");
   if (state[field][k]) { delete state[field][k]; markDirty(); }
   if (isVideo && state.vframe[k]) { delete state.vframe[k]; markDirty(); }
   scheduleRender();
@@ -3633,6 +3975,77 @@ async function setBackdrop(k, file, say) {
   say("Getting your image ready…");
   const blob = await prepareImage(file, false);
   return saveMedia("bg", k, blob, "image/jpeg", say);
+}
+// Your profile's background: a GIF (kept as it is, so it keeps moving), a short video (plays silently on a loop),
+// or a photo. Your picture: a photo cropped square, or a GIF or PNG kept as it is.
+const PROFILE_KEY = { pbg: "bg", pava: "avatar" };
+const profileMediaUrl = kind => mediaUrl(kind, PROFILE_KEY[kind]);
+function profileMediaType(kind) {
+  const k = PROFILE_KEY[kind], rec = state.profile[k];
+  if (rec && validAssetId(rec.id)) return rec.m || "image/jpeg";
+  return localTypes.get(deviceKey(kind, k)) || "";
+}
+async function setProfileMedia(kind, file, say) {
+  const k = PROFILE_KEY[kind], type = (file.type || "").toLowerCase();
+  const isVideo = /^video\//.test(type) || /\.(mp4|m4v|mov|webm)$/i.test(file.name || "");
+  if (isVideo) {
+    if (kind !== "pbg") throw { code: "not_image" };
+    const vt = videoUploadType(file);
+    if (!vt) throw { code: "not_video" };
+    if (file.size > VIDEO_MAX) throw { code: "bg_video_big" };
+    say("Checking your video…");
+    const info = await probeMedia(file, "video");
+    if (info.ok === false) throw { code: "video_unplayable" };
+    return saveMedia(kind, k, file, vt, say, { m: vt });
+  }
+  if (type && !/^image\//.test(type)) throw { code: "not_image" };
+  // a GIF, and a WebP or PNG that isn't huge, are kept exactly as they are: they may move, or be see-through
+  if (type === "image/gif" || ((type === "image/webp" || type === "image/png" || type === "image/apng") && file.size <= 8 * 1048576)) {
+    if (file.size > VIDEO_MAX) throw { code: "gif_big" };
+    say("Saving it…");
+    return saveMedia(kind, k, file, type, say, { m: type });
+  }
+  say("Getting your image ready…");
+  const blob = await prepareImage(file, kind === "pava");
+  return saveMedia(kind, k, blob, "image/jpeg", say, { m: "image/jpeg" });
+}
+// A badge's picture: a see-through PNG (a cut-out, like a sticker) stays see-through so its outline follows the
+// shape; a photo becomes a JPEG shown in a circle; a GIF keeps moving. At most 640 pixels across: it's shown small.
+const BADGE_PX = 640;
+async function prepareBadgeImage(file) {
+  if (file.type && !/^image\//i.test(file.type)) throw { code: "not_image" };
+  if (file.size > 40 * 1024 * 1024) throw { code: "too_big" };
+  let d;
+  try { d = await decodeImage(file); } catch { throw { code: "decode" }; }
+  try {
+    if (!d.w || !d.h) throw { code: "decode" };
+    const f = Math.min(1, BADGE_PX / Math.max(d.w, d.h)), W = Math.max(8, Math.round(d.w * f)), H = Math.max(8, Math.round(d.h * f));
+    const cv = document.createElement("canvas");
+    cv.width = W; cv.height = H;
+    const c = cv.getContext("2d");
+    c.imageSmoothingEnabled = true; c.imageSmoothingQuality = "high";
+    c.drawImage(d.src, 0, 0, W, H);
+    // see-through if a good share of it is clear: then it's a cut-out
+    let clear = 0;
+    try { const px = c.getImageData(0, 0, W, H).data; for (let i = 3; i < px.length; i += 16) if (px[i] < 200) clear++; } catch { clear = 0; }
+    const cut = clear > (W * H / 4) * 0.04;
+    // a GIF that isn't huge is kept as it is, so it keeps moving
+    if (/^image\/gif$/i.test(file.type || "") && file.size <= 8 * 1048576) return { blob: file, type: "image/gif", cut };
+    if (!cut) { c.globalCompositeOperation = "destination-over"; c.fillStyle = "#000000"; c.fillRect(0, 0, W, H); }
+    const type = cut ? "image/png" : "image/jpeg";
+    const blob = await new Promise(res => { try { cv.toBlob(res, type, 0.88); } catch { res(null); } });
+    if (!blob || !blob.size) throw { code: "decode" };
+    return { blob, type, cut };
+  } finally { d.done(); }
+}
+// A playlist's own cover: a photo cropped square, or a GIF kept as it is so it keeps moving.
+async function setPlaylistCover(id, file, say) {
+  const type = (file.type || "").toLowerCase();
+  if (type && !/^image\//.test(type)) throw { code: "not_image" };
+  if (type === "image/gif" && file.size <= 8 * 1048576) { say("Saving it…"); return saveMedia("plc", id, file, type, say, { m: type }); }
+  say("Getting your image ready…");
+  const blob = await prepareCover(file);
+  return saveMedia("plc", id, blob, "image/jpeg", say, { m: "image/jpeg" });
 }
 async function removeMedia(kind, k) {
   const field = MEDIA[kind].field, prev = state[field][k];
@@ -4412,6 +4825,16 @@ function musicControls(k, btnClass) {
 }
 
 function mediaErrorText(e, kind) {
+  if (kind === "pbg" || kind === "pava") {
+    const what = kind === "pbg" ? "background" : "profile picture";
+    switch (e && e.code) {
+      case "bg_video_big": return `Background videos can be up to ${fmtMB(VIDEO_MAX)}. Trim it, or pick a GIF or a photo.`;
+      case "gif_big": return `That file is over ${fmtMB(VIDEO_MAX)}. Pick a smaller GIF or a photo.`;
+      case "not_image": return kind === "pava" ? "Pick a photo, a GIF or a PNG for your picture." : "That file isn't a GIF, photo or video Cratewalk can use.";
+      case "no_storage": return `Your ${what} can't be saved in this view. Open the game in claude.ai and try again.`;
+      default: kind = kind === "pbg" ? "bg" : "cover";
+    }
+  }
   const video = kind === "video", noun = video ? "video" : kind === "bg" ? "background" : "cover";
   if (kind === "music") {
     switch (e && e.code) {
@@ -4453,6 +4876,551 @@ function mediaErrorText(e, kind) {
     case "store_unavailable": return "Storage is busy right now. Try again in a moment.";
     default: return `Couldn't save the ${noun}. Try again.`;
   }
+}
+
+// =====================================================================
+// Playlists: your own lists of songs from your crate, kept on your profile like SoundMap's. Each one opens as
+// its own page: its cover (four of its songs, or a picture you pick), its name and its songs in your order.
+// Add songs from your crate, take them out, drag them into order, rename it, give it a cover, make it on
+// Spotify, or delete it. A card's Options can put its song in any playlist too.
+// =====================================================================
+const PL_ICON = {
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 12.5l4.2 4.2L18.5 7.8"/></svg>',
+  more: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="12" r="1.9" fill="currentColor"/><circle cx="12" cy="12" r="1.9" fill="currentColor"/><circle cx="18.5" cy="12" r="1.9" fill="currentColor"/></svg>',
+  minus: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#FF453A"/><path d="M7.5 12h9" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"/></svg>',
+  grip: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 8.5h14M5 12h14M5 15.5h14"/></svg>',
+};
+const PICK_SHOW = 300;   // songs listed at once when adding; search finds the rest
+const plById = id => state.playlists.find(p => p.id === id) || null;
+const songsText = n => `${fmtN(n)} song${n === 1 ? "" : "s"}`;
+const sortedPlaylists = () => [...state.playlists].sort((a, b) => b.u - a.u || b.t - a.t);
+const newPlId = () => "p" + (Date.now().toString(36) + Math.random().toString(36).slice(2)).replace(/[^a-z0-9]/g, "").slice(-10);
+const plSongCount = () => state.playlists.reduce((n, p) => n + p.songs.length, 0);
+function defaultPlName() {
+  const used = new Set(state.playlists.map(p => p.name));
+  let n = state.playlists.length + 1;
+  while (used.has(`My playlist #${n}`)) n++;
+  return `My playlist #${n}`;
+}
+
+// ---------- making and changing playlists ----------
+function createPlaylist(name, songs) {
+  if (state.playlists.length >= PL_MAX) {
+    toast(`You have ${PL_MAX} playlists, the most there's room for. Delete one to make another.`, "bad", 4200);
+    return null;
+  }
+  const t = now();
+  const p = { id: newPlId(), name: cleanText(name, PL_NAME) || defaultPlName(), songs: [], t, u: t };
+  state.playlists.push(p);
+  for (const k of songs || []) addToPlaylist(p, k);
+  markDirty();
+  return p;
+}
+// Puts a song in a playlist, once. False when there's no room: 500 songs in a playlist, 4,000 across all of them.
+function addToPlaylist(p, k) {
+  if (p.songs.includes(k)) return true;
+  if (p.songs.length >= PL_SONGS) { toast(`A playlist holds up to ${fmtN(PL_SONGS)} songs.`, "bad", 3600); return false; }
+  if (plSongCount() >= PL_TOTAL) { toast(`Your playlists hold up to ${fmtN(PL_TOTAL)} songs in all. Take some out to add more.`, "bad", 4200); return false; }
+  p.songs.push(k);
+  p.u = now();
+  markDirty();
+  return true;
+}
+function removeFromPlaylist(p, k) {
+  const i = p.songs.indexOf(k);
+  if (i < 0) return;
+  p.songs.splice(i, 1);
+  p.u = now();
+  markDirty();
+}
+function moveInPlaylist(p, from, to) {
+  if (from === to || from < 0 || to < 0 || from >= p.songs.length || to >= p.songs.length) return false;
+  const [k] = p.songs.splice(from, 1);
+  p.songs.splice(to, 0, k);
+  p.u = now();
+  markDirty();
+  return true;
+}
+function deletePlaylist(id) {
+  const p = plById(id);
+  if (!p) return;
+  state.playlists = state.playlists.filter(x => x.id !== id);
+  markDirty();
+  toast(`Deleted ${p.name}`);
+  if (state.plImgs[id] || localMedia.plc.has(id)) removeMedia("plc", id).catch(() => {});
+}
+// The copy of a song a playlist shows and opens: your rarest one, then the lowest copy number.
+function bestCopies() {
+  const m = new Map();
+  for (const c of state.cards) {
+    const b = m.get(c.k);
+    if (!b) { m.set(c.k, c); continue; }
+    const r = rarityOf(c), rb = rarityOf(b);
+    if (r > rb || (r === rb && (c.n || Infinity) < (b.n || Infinity))) m.set(c.k, c);
+  }
+  return m;
+}
+// Every song in your crate once, newest first.
+function crateSongs() {
+  const seen = new Set(), out = [];
+  for (const c of [...state.cards].sort((a, b) => b.t - a.t)) if (!seen.has(c.k)) { seen.add(c.k); out.push(c.k); }
+  return out;
+}
+
+// ---------- covers ----------
+// A playlist's cover: your picture if you picked one, otherwise its first four songs in a square (or its first
+// song while it has fewer than four), or a note while it's empty.
+function fillMosaic(box, p) {
+  const keys = p.songs.slice(0, 4);
+  box.classList.toggle("quad", keys.length >= 4);
+  box.classList.toggle("blank", !keys.length);
+  if (!keys.length) { box.innerHTML = PF_ICON.tile; return; }
+  box.replaceChildren(...(keys.length >= 4 ? keys : keys.slice(0, 1)).map(k => coverImg(k)));
+}
+function plCover(p, cls) {
+  const box = h("span", { class: "pl-cover" + (cls ? " " + cls : ""), "aria-hidden": "true" });
+  const url = mediaUrl("plc", p.id);
+  if (url) {
+    const img = h("img", { src: url, alt: "", decoding: "async" });
+    img.addEventListener("error", () => { if (img.isConnected) fillMosaic(box, p); }, { once: true });
+    box.append(img);
+  } else fillMosaic(box, p);
+  return box;
+}
+function plGlowUrl(p) {
+  const own = mediaUrl("plc", p.id);
+  if (own) return own;
+  const k = p.songs[0];
+  return k ? customCoverUrl(k) || coverURL(k) : "";
+}
+
+// ---------- the Playlists card on your profile ----------
+function plRow(p, onOpen) {
+  const b = h("button", { class: "pf-pl", type: "button", "aria-label": `${p.name}, ${songsText(p.songs.length)}` },
+    plCover(p, "pf-tile"),
+    h("span", { class: "pf-pl-info" }, h("b", { text: p.name }), h("span", { text: songsText(p.songs.length) })));
+  b.addEventListener("click", () => onOpen());
+  return b;
+}
+function plNewRow(onTap) {
+  const b = h("button", { class: "pf-pl pf-pl-new", type: "button" },
+    h("span", { class: "pl-cover pf-tile add", "aria-hidden": "true", html: PL_ICON.plus }),
+    h("span", { class: "pf-pl-info" }, h("b", { text: "New playlist" })));
+  b.addEventListener("click", () => onTap());
+  return b;
+}
+function playlistsCard() {
+  const list = sortedPlaylists();
+  return h("div", { class: "pf-card" },
+    pfHead(PF_ICON.disc, "Playlists", list.length ? "see" : null, list.length ? () => openPlaylists() : null),
+    h("div", { class: "pf-pls" }, list.slice(0, 3).map(p => plRow(p, () => openPlaylist(p.id))), plNewRow(() => openNewPlaylist())));
+}
+
+// ---------- pages ----------
+// Playlist pages are full-screen like your profile, with a bar at the top that stays put; it fills in and shows
+// the name once you scroll past the header. Moving between pages that are already open slides the new one in.
+function plTopBar(onBack, title, right) {
+  const back = h("button", { class: "pf-back", type: "button", "aria-label": "Back", html: HERO_ICON.back });
+  back.addEventListener("click", () => onBack());
+  return h("div", { class: "pl-top" }, back, h("b", { class: "pl-top-t", text: title || "" }), h("div", { class: "pl-top-r" }, right || null));
+}
+function plBarSync() {
+  const body = $("#sheetBody"), bar = body.querySelector(":scope > .pl-top");
+  if (bar) bar.classList.toggle("solid", body.scrollTop > (+bar.dataset.at || 40));
+}
+let plScrollBound = false;
+function navAnim(dir) {
+  const body = $("#sheetBody");
+  body.classList.remove("nav-fwd", "nav-back");
+  if (!dir || reduceMotion) return;
+  void body.offsetWidth;   // start the animation again
+  body.classList.add(dir === "back" ? "nav-back" : "nav-fwd");
+}
+function plOpen(nodes, label, dir, extra) {
+  const wasPage = !$("#sheetWrap").hidden && !closingTimer && $("#sheet").classList.contains("epic");
+  openSheet(nodes, label, null, { variant: "epic", page: "pl", extra });
+  if (!plScrollBound) {
+    plScrollBound = true;
+    const body = $("#sheetBody");
+    body.addEventListener("scroll", plBarSync, { passive: true });
+    body.addEventListener("animationend", e => { if (e.target === body) body.classList.remove("nav-fwd", "nav-back"); });
+  }
+  navAnim(wasPage ? dir : null);
+}
+// The sheet that slides up over a playlist page: its options, or the songs to add.
+function plPanel() {
+  const title = h("b");
+  const close = h("button", { class: "epic-opts-close", type: "button", "aria-label": "Close", html: ICON.close });
+  const body = h("div", { class: "epic-opts-body" });
+  const panel = h("div", { class: "epic-opts-panel", role: "dialog", tabindex: "-1" }, h("div", { class: "epic-opts-head" }, title, close), body);
+  const scrim = h("div", { class: "epic-opts-scrim" });
+  const el = h("div", { class: "epic-opts sheet-extra", hidden: true }, scrim, panel);
+  const me = {
+    el, btn: null, byKey: false, onHide: null,
+    show(t, nodes, btn, onHide, byKey) {
+      title.textContent = t;
+      panel.setAttribute("aria-label", t);
+      me.fill(nodes);
+      me.btn = btn || null; me.onHide = onHide || null; me.byKey = !!byKey;
+      if (me.btn) me.btn.setAttribute("aria-expanded", "true");
+      el.hidden = false;
+      setTimeout(() => { try { (byKey ? close : panel).focus({ preventScroll: true }); } catch { /* ignore */ } }, 30);
+    },
+    fill(nodes) { body.replaceChildren(...nodes.filter(Boolean)); body.scrollTop = 0; },
+  };
+  close.addEventListener("click", closeEpicOptions);
+  scrim.addEventListener("click", closeEpicOptions);
+  epicOpts = me;
+  return me;
+}
+
+// All your playlists, newest changes first, with New playlist at the top.
+function openPlaylists(dir) {
+  const list = sortedPlaylists();
+  const top = plTopBar(closeSheet, "Playlists");
+  top.dataset.at = "44";
+  plOpen([top,
+    h("h1", { class: "pl-h1", text: "Playlists" }),
+    h("div", { class: "pf-pls pl-all" }, plNewRow(() => openNewPlaylist("list")),
+      list.map(p => plRow(p, () => openPlaylist(p.id, { from: "list", dir: "fwd" })))),
+    list.length ? null : h("p", { class: "pl-empty", text: "Make a playlist, then fill it with songs from your crate." })], "Playlists", dir);
+}
+function openNewPlaylist(from) {
+  if (state.playlists.length >= PL_MAX) { toast(`You have ${PL_MAX} playlists, the most there's room for. Delete one to make another.`, "bad", 4200); return; }
+  const inp = h("input", { class: "input", id: "plNameIn", type: "text", maxlength: String(PL_NAME), placeholder: defaultPlName(), "aria-label": "Playlist name",
+    autocomplete: "off", enterkeyhint: "done", spellcheck: "false", "data-autofocus": "" });
+  const make = h("button", { class: "btn btn-primary", type: "button" }, "Create");
+  const go = () => {
+    const p = createPlaylist(inp.value, []);
+    if (!p) return;
+    inp.blur();
+    toast(`Made ${p.name}`, "good");
+    openPlaylist(p.id, { from, add: true });
+  };
+  make.addEventListener("click", go);
+  inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); go(); } });
+  const cancel = h("button", { class: "btn btn-ghost", type: "button" }, "Cancel");
+  cancel.addEventListener("click", () => { if (from === "list") openPlaylists(); else closeSheet(); });
+  openSheet([h("h2", { text: "New playlist" }),
+    h("p", { class: "muted", text: "Give it a name. Next you'll pick songs from your crate." }),
+    inp, h("div", { class: "btn-row" }, make, cancel)], "New playlist");
+}
+function plByLine(p) {
+  const name = state.username || (meInfo && meInfo.name) || "You";
+  const pic = profileMediaUrl("pava") || (meInfo && meInfo.avatarUrl) || "";
+  return h("div", { class: "pl-by" },
+    h("span", { class: "pl-ava" }, pic ? h("img", { src: pic, alt: "" }) : name.charAt(0).toUpperCase()),
+    h("b", { text: name }), h("span", { "aria-hidden": "true", text: "·" }), h("span", { text: songsText(p.songs.length) }));
+}
+// One song on a playlist page. Tap it to open your copy. While editing: the red button takes it out and the
+// handle drags it (or moves it with the arrow keys).
+function plSongRow(p, k, i, c, editing, act) {
+  const s = SONG_BY_KEY.get(k), r = c ? rarityOf(c) : -1;
+  const main = h("button", { class: "srow-main", type: "button", tabindex: editing ? "-1" : null,
+    "aria-label": `${s.title} by ${s.artist}` + (c ? `, ${RARITY[r].name}` : ", not in your crate") },
+    rowThumb(k, c && c.n),
+    h("span", { class: "srow-info" }, h("span", { class: "srow-t", text: s.title }), h("span", { class: "srow-a", text: s.artist }),
+      c ? rarityChip(r) : h("span", { class: "rchip gone" }, h("span", { class: "rchip-dot" }), "Not in your crate")));
+  main.addEventListener("click", () => {
+    if (editing) return;
+    if (!c) { toast("That song isn't in your crate anymore."); return; }
+    act.open(c.id);
+  });
+  if (editing) {
+    const rm = h("button", { class: "pl-rm", type: "button", "aria-label": `Take ${s.title} out`, html: PL_ICON.minus });
+    rm.addEventListener("click", () => act.remove(k));
+    const grip = h("button", { class: "pl-grip", type: "button", "aria-label": `Move ${s.title}. Drag, or use the arrow keys.`, html: PL_ICON.grip });
+    grip.addEventListener("keydown", e => {
+      const d = e.key === "ArrowUp" ? -1 : e.key === "ArrowDown" ? 1 : 0;
+      if (!d) return;
+      e.preventDefault();
+      act.move(i, i + d, true);
+    });
+    return h("div", { class: "srow pl-row" + (c ? " r" + r : " gone") }, rm, main, grip);
+  }
+  const play = hasMusic(k) ? musicControls(k, "srow-play")[0]
+    : h("a", { class: "srow-play", href: spotifySearchUrl(s), target: "_blank", rel: "noopener", "aria-label": `Play ${s.title} on Spotify`, html: HERO_ICON.play });
+  return h("div", { class: "srow pl-row" + (c ? " r" + r : " gone") }, main, play);
+}
+// Drag a row by its handle to move it: the rows around it make room, and the page scrolls when you near its
+// top or bottom. done(from, to) gets the move.
+function dragSort(list, done) {
+  list.addEventListener("pointerdown", e => {
+    const grip = e.target.closest && e.target.closest(".pl-grip");
+    if (!grip || !list.contains(grip) || (e.pointerType === "mouse" && e.button !== 0)) return;
+    const rows = [...list.querySelectorAll(":scope > .pl-row")], row = grip.closest(".pl-row"), from = rows.indexOf(row);
+    if (from < 0) return;
+    e.preventDefault();
+    const scroller = list.closest(".sheet-body") || list.parentElement;
+    const pitch = rows.length > 1 ? rows[1].offsetTop - rows[0].offsetTop : row.offsetHeight;
+    const y0 = e.clientY, s0 = scroller.scrollTop;
+    let y = y0, to = from, raf = 0;
+    try { grip.setPointerCapture(e.pointerId); } catch { /* ignore */ }
+    row.classList.add("dragging");
+    const place = () => {
+      const dy = y - y0 + scroller.scrollTop - s0;
+      row.style.transform = `translateY(${dy}px)`;
+      to = clamp(from + Math.round(dy / pitch), 0, rows.length - 1);
+      rows.forEach((r, i) => {
+        if (r === row) return;
+        const shift = from < to && i > from && i <= to ? -pitch : from > to && i < from && i >= to ? pitch : 0;
+        r.style.transform = shift ? `translateY(${shift}px)` : "";
+      });
+    };
+    const edge = () => {
+      raf = 0;
+      const box = scroller.getBoundingClientRect(), bar = scroller.querySelector(":scope > .pl-top");
+      const top = (bar ? bar.getBoundingClientRect().bottom : box.top) + 36, bottom = box.bottom - 56;
+      const v = y < top ? -Math.min(16, (top - y) / 3 + 3) : y > bottom ? Math.min(16, (y - bottom) / 3 + 3) : 0;
+      if (!v) return;
+      const before = scroller.scrollTop;
+      scroller.scrollTop = before + v;
+      if (scroller.scrollTop !== before) place();
+      raf = requestAnimationFrame(edge);
+    };
+    const move = ev => { y = ev.clientY; place(); if (!raf) raf = requestAnimationFrame(edge); };
+    const end = () => {
+      grip.removeEventListener("pointermove", move);
+      grip.removeEventListener("pointerup", end);
+      grip.removeEventListener("pointercancel", end);
+      if (raf) cancelAnimationFrame(raf);
+      row.classList.remove("dragging");
+      rows.forEach(r => { r.style.transform = ""; });
+      if (to !== from) done(from, to);
+    };
+    grip.addEventListener("pointermove", move);
+    grip.addEventListener("pointerup", end);
+    grip.addEventListener("pointercancel", end);
+  });
+}
+// A playlist's page. o.from "list": Back returns to all your playlists. o.add: the song picker opens right away.
+// o.scroll: where the page was, when coming back from a card.
+function openPlaylist(id, o) {
+  o = o || {};
+  if (!plById(id)) { if (o.from === "list") openPlaylists("back"); else closeSheet(); return; }
+  let editing = false;
+  const back = () => { closeEpicOptions(); if (o.from === "list") openPlaylists("back"); else closeSheet(); };
+  const panel = plPanel();
+  const more = h("button", { class: "pf-more pl-more", type: "button", "aria-label": "Playlist options", "aria-haspopup": "dialog", "aria-expanded": "false", html: PL_ICON.more });
+  const top = plTopBar(back, "", more);
+  top.dataset.at = "300";
+  const glow = h("div", { class: "pl-glow", "aria-hidden": "true" });
+  const head = h("div", { class: "pl-head" }), acts = h("div", { class: "pl-acts" }), list = h("div", { class: "pl-songs" }), foot = h("div", { class: "pl-foot" });
+  const act = {
+    open: cardId => {
+      const at = $("#sheetBody").scrollTop;
+      closeEpicOptions();
+      openCardSheet(cardId);
+      navAnim("fwd");
+      // the card's back arrow comes back here instead of closing everything
+      const b = $("#sheetBody .epic-back");
+      if (b) {
+        const nb = b.cloneNode(true);
+        nb.addEventListener("click", () => { stopMusic(); openPlaylist(id, { from: o.from, dir: "back", scroll: at }); });
+        b.replaceWith(nb);
+      }
+    },
+    remove: k => { const p = plById(id); if (p) { removeFromPlaylist(p, k); paint(); } },
+    move: (from, to, focus) => {
+      const p = plById(id);
+      if (!p || !moveInPlaylist(p, from, to)) return;
+      paint();
+      if (focus) { const g = list.querySelectorAll(".pl-grip")[to]; if (g) g.focus(); }
+    },
+  };
+  const paint = () => {
+    const p = plById(id);
+    if (!p) return;
+    if (!p.songs.length) editing = false;
+    top.querySelector(".pl-top-t").textContent = p.name;
+    const g = plGlowUrl(p);
+    glow.replaceChildren(...(g ? [h("img", { src: g, alt: "", decoding: "async" })] : []));
+    head.replaceChildren(plCover(p, "big"), h("h1", { class: "pl-name", text: p.name }), plByLine(p));
+    const add = h("button", { class: "pl-btn pl-add", type: "button" }, h("span", { class: "pl-btn-i", html: PL_ICON.plus }), "Add songs");
+    add.addEventListener("click", e => showAdd(e));
+    const edit = p.songs.length ? h("button", { class: "pl-btn" + (editing ? " on" : ""), type: "button", "aria-pressed": String(editing) }, editing ? "Done" : "Edit") : null;
+    if (edit) edit.addEventListener("click", () => { editing = !editing; paint(); });
+    acts.replaceChildren(add, edit || "");
+    const copies = bestCopies();
+    list.classList.toggle("editing", editing);
+    list.replaceChildren(...p.songs.map((k, i) => plSongRow(p, k, i, copies.get(k), editing, act)));
+    foot.replaceChildren(
+      p.songs.length ? "" : h("div", { class: "pl-empty" }, h("b", null, "No songs yet"), h("span", null, "Tap Add songs to pick some from your crate.")),
+      editing || !p.songs.length ? confirmButton("Delete playlist", "Tap again to delete it", "btn btn-ghost pl-del", () => { deletePlaylist(id); back(); }) : "");
+  };
+  const showAdd = e => panel.show("Add songs", addSongsBody(id), e && e.currentTarget, paint, !!e && e.detail === 0);
+  more.addEventListener("click", e => panel.show("Playlist options", playlistOptions(id, paint, back, panel), more, paint, e.detail === 0));
+  dragSort(list, (from, to) => act.move(from, to, false));
+  plOpen([top, glow, head, acts, list, foot], plById(id).name, o.dir, panel.el);
+  paint();
+  if (o.scroll) { $("#sheetBody").scrollTop = o.scroll; plBarSync(); }
+  if (o.add) showAdd();
+}
+// Adding songs: everything in your crate, newest first, with a search. Tap a song to put it in or take it out.
+function addSongsBody(id) {
+  const owned = crateSongs();
+  const q = h("input", { class: "input search", id: "plSearch", type: "search", placeholder: "Search your crate", "aria-label": "Search your crate",
+    autocomplete: "off", enterkeyhint: "search", spellcheck: "false" });
+  const count = h("div", { class: "pl-count", role: "status" });
+  const list = h("div", { class: "pl-picks" });
+  const setCount = () => { const p = plById(id); count.textContent = p ? `${songsText(p.songs.length)} in ${p.name}` : ""; };
+  const toggle = k => {
+    const p = plById(id);
+    if (!p) return null;
+    if (p.songs.includes(k)) { removeFromPlaylist(p, k); setCount(); return false; }
+    if (!addToPlaylist(p, k)) return null;
+    setCount();
+    return true;
+  };
+  const paint = () => {
+    const p = plById(id);
+    if (!p) return;
+    const t = q.value.trim().toLowerCase();
+    const keys = t ? owned.filter(k => { const s = SONG_BY_KEY.get(k); return s.title.toLowerCase().includes(t) || s.artist.toLowerCase().includes(t); }) : owned;
+    const inSet = new Set(p.songs);
+    list.replaceChildren(...keys.slice(0, PICK_SHOW).map(k => pickRow(k, inSet.has(k), () => toggle(k))),
+      keys.length > PICK_SHOW ? h("p", { class: "hint", text: `Showing ${PICK_SHOW} of ${fmtN(keys.length)}. Search to find the rest.` }) : "",
+      keys.length ? "" : h("p", { class: "hint", text: owned.length ? "Nothing in your crate matches that." : "Your crate is empty. Open drops on the map to collect songs." }));
+  };
+  q.addEventListener("input", debounce(paint, 120));
+  q.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); q.blur(); } });
+  setCount();
+  paint();
+  return [h("div", { class: "pl-addwrap" }, h("div", { class: "pl-search" }, q, count), list)];
+}
+function pickRow(k, on, toggle) {
+  const s = SONG_BY_KEY.get(k);
+  const tick = h("span", { class: "pl-tick", html: on ? PL_ICON.check : PL_ICON.plus });
+  const b = h("button", { class: "pl-pick" + (on ? " on" : ""), type: "button", "aria-pressed": String(on) },
+    h("span", { class: "pl-pick-art" }, coverImg(k)),
+    h("span", { class: "pl-pick-info" }, h("b", { text: s.title }), h("span", { text: s.artist })), tick);
+  b.addEventListener("click", () => {
+    const r = toggle();
+    if (r === null) return;
+    b.classList.toggle("on", r);
+    b.setAttribute("aria-pressed", String(r));
+    tick.innerHTML = r ? PL_ICON.check : PL_ICON.plus;
+  });
+  return b;
+}
+// The ••• sheet: the name, the cover, Spotify, and deleting.
+function playlistOptions(id, repaint, leave, panel) {
+  const p = plById(id);
+  if (!p) return [];
+  const refresh = () => { if (!panel.el.hidden && plById(id)) panel.fill(playlistOptions(id, repaint, leave, panel)); };
+  const status = h("div", { class: "hint", role: "status" }, "A photo or a GIF. Until you pick one, the cover is four of its songs.");
+  const say = (t, bad) => { status.className = bad ? "msg bad" : "hint"; status.textContent = t; };
+  // name
+  const inp = h("input", { class: "input", id: "plRename", type: "text", maxlength: String(PL_NAME), "aria-label": "Playlist name", autocomplete: "off", enterkeyhint: "done", spellcheck: "false" });
+  inp.value = p.name;
+  const saveName = () => {
+    const cur = plById(id);
+    if (!cur) return;
+    const v = cleanText(inp.value, PL_NAME);
+    if (!v) { inp.value = cur.name; say("A playlist needs a name.", true); return; }
+    inp.value = v;
+    if (v !== cur.name) { cur.name = v; cur.u = now(); markDirty(); toast("Playlist renamed", "good"); repaint(); }
+    inp.blur();
+  };
+  inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); saveName(); } });
+  // cover
+  const own = !!mediaUrl("plc", id);
+  const file = h("input", { type: "file", accept: "image/*", id: "plCoverFile", class: "sr", tabindex: "-1", "aria-hidden": "true" });
+  const pick = h("button", { class: "btn btn-ghost btn-sm", type: "button" }, own ? "Change" : "Choose picture");
+  pick.addEventListener("click", () => file.click());
+  file.addEventListener("change", async () => {
+    const f = file.files && file.files[0];
+    file.value = "";
+    if (!f) return;
+    pick.disabled = true;
+    try {
+      const where = await setPlaylistCover(id, f, t => say(t));
+      if (!plById(id)) { removeMedia("plc", id).catch(() => {}); return; }   // deleted while it saved
+      toast(`Cover set${where === "device" ? " on this device" : ""}`, "good");
+      repaint();
+      refresh();
+    } catch (e) {
+      pick.disabled = false;
+      say(mediaErrorText(e, "cover"), true);
+    }
+  });
+  const reset = own ? confirmButton("Use song covers", "Tap again", "btn btn-ghost btn-sm", async () => {
+    await removeMedia("plc", id);
+    toast("Cover removed");
+    repaint();
+    refresh();
+  }) : null;
+  // Spotify, where it's connected
+  let spotify = null;
+  if (spotifyOn()) {
+    const note = h("div", { class: "hint", role: "status" });
+    const btn = h("button", { class: "btn btn-ink btn-sm", type: "button", disabled: p.songs.length ? null : true }, "Make it on Spotify");
+    btn.addEventListener("click", async () => {
+      const cur = plById(id);
+      if (!cur || !cur.songs.length) return;
+      btn.disabled = true; btn.textContent = "Making it…"; note.textContent = "";
+      try {
+        const r = await spotifyPlaylist(cur.name, cur.songs);
+        note.replaceChildren(r.msg, r.url ? " " : "", r.url ? h("a", { href: r.url, target: "_blank", rel: "noopener", text: "Open it in Spotify" }) : "");
+        toast("Spotify playlist made", "good");
+      } catch (e) { note.textContent = (e && e.msg) || "Spotify didn't answer. Try again in a moment."; }
+      btn.disabled = false; btn.textContent = "Make it on Spotify";
+    });
+    spotify = h("div", { class: "setting setting-save" },
+      h("div", null, h("b", null, "Spotify"), h("div", { class: "hint", text: p.songs.length ? "Make this playlist in your Spotify, then play it while you walk." : "Add songs first." })),
+      h("div", { class: "btn-row" }, btn), note);
+  }
+  return [
+    h("div", { class: "bdg-field" }, h("label", { class: "eyebrow", for: "plRename", text: "Name" }),
+      h("div", { class: "row" }, inp, h("button", { class: "btn btn-primary btn-sm", type: "button", onclick: saveName }, "Save"))),
+    h("div", null,
+      h("div", { class: "pe-row" }, plCover(p, "opt"),
+        h("div", { class: "pe-info" }, h("b", null, "Cover"), h("span", null, own ? "Your picture" + (mediaOrigin("plc", id) === "device" ? " · this device only" : "") : "Four of its songs")),
+        h("div", { class: "pe-acts" }, pick, reset), file),
+      status),
+    spotify,
+    h("div", { class: "btn-row" }, confirmButton("Delete playlist", "Tap again to delete it", "btn btn-ghost pl-del", () => { deletePlaylist(id); leave(); })),
+  ];
+}
+// A card's Options: put its song in your playlists (or take it out), or start a new playlist with it.
+function playlistChooser(k) {
+  const box = h("div", { class: "pl-choose" });
+  const paint = () => {
+    const rows = sortedPlaylists().map(p => {
+      const on = p.songs.includes(k);
+      const b = h("button", { class: "pl-pick" + (on ? " on" : ""), type: "button", "aria-pressed": String(on) },
+        plCover(p, "sm"),
+        h("span", { class: "pl-pick-info" }, h("b", { text: p.name }), h("span", { text: songsText(p.songs.length) })),
+        h("span", { class: "pl-tick", html: on ? PL_ICON.check : PL_ICON.plus }));
+      b.addEventListener("click", () => {
+        const cur = plById(p.id);
+        if (!cur) return;
+        if (cur.songs.includes(k)) { removeFromPlaylist(cur, k); toast(`Taken out of ${cur.name}`); }
+        else if (addToPlaylist(cur, k)) toast(`Added to ${cur.name}`, "good");
+        paint();
+      });
+      return b;
+    });
+    const inp = h("input", { class: "input", id: "plQuickName", type: "text", maxlength: String(PL_NAME), placeholder: defaultPlName(), "aria-label": "New playlist name",
+      autocomplete: "off", enterkeyhint: "done", spellcheck: "false" });
+    const make = h("button", { class: "btn btn-primary btn-sm", type: "button" }, "Create");
+    const go = () => {
+      const p = createPlaylist(inp.value, [k]);
+      if (!p) return;
+      inp.blur();
+      toast(p.songs.includes(k) ? `Made ${p.name} with this song` : `Made ${p.name}`, "good");
+      paint();
+    };
+    make.addEventListener("click", go);
+    inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); go(); } });
+    box.replaceChildren(
+      h("div", { class: "eyebrow", text: "Add to playlist" }),
+      rows.length ? h("div", { class: "pl-picks" }, rows) : h("p", { class: "hint", text: "You don't have a playlist yet. Name one and this song goes in it." }),
+      state.playlists.length < PL_MAX ? h("div", { class: "pl-quick" }, h("label", { class: "hint", for: "plQuickName", text: "New playlist" }), h("div", { class: "row" }, inp, make)) : "");
+  };
+  paint();
+  return box;
 }
 
 // =====================================================================
@@ -4505,24 +5473,28 @@ function renderHud() {
   $("#hudRing").style.setProperty("--p", ((state.xp - a) / Math.max(1, b - a)).toFixed(3));
   $("#hudCoins").textContent = fmtN(state.coins);
 }
-function toast(msg, kind) {
+function toast(msg, kind, ms) {
   const box = $("#toasts");
   const el = h("div", { class: "toast " + (kind || ""), role: "status" }, msg);
   box.append(el);
   while (box.children.length > 3) box.firstChild.remove();
-  setTimeout(() => { el.classList.add("out"); setTimeout(() => el.remove(), 320); }, 2900);
+  setTimeout(() => { el.classList.add("out"); setTimeout(() => el.remove(), 320); }, ms || 2900);
 }
 function setMsg(el, text, kind) { el.className = "msg" + (kind ? " " + kind : ""); el.textContent = text; el.hidden = !text; }
 function updateBadges() {
   const inc = incomingOffers().filter(o => o.status === "pending").length;
-  const bm = $("#badgeMarket");
+  const bm = $("#badgeMarket"), bo = $("#badgeOffers");
   bm.hidden = !inc; bm.textContent = inc ? String(inc) : "";
+  bo.hidden = !inc; bo.textContent = inc ? String(inc) : "";
   const q = claimableQuests();
   const bq = $("#badgeQuests");
   bq.hidden = !q; bq.textContent = q ? String(q) : "";
 }
 function setTab(t) {
+  if (t === "me" && curTab !== "me") prevTab = curTab;
   curTab = t;
+  $("#app").classList.toggle("on-me", t === "me");
+  profileBgPlay(t === "me");
   $$(".tab").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === t)));
   for (const p of ["crate", "market", "quests", "me"]) $("#panel-" + p).hidden = p !== t;
   if (t === "crate") renderCrate();
@@ -4789,6 +5761,7 @@ function openSheet(nodes, label, onClose, opts) {
   const sheet = $("#sheet"), epic = !!(opts && opts.variant === "epic");
   sheet.classList.toggle("epic", epic);
   sheet.classList.toggle("clean", epic && !!opts.clean);
+  sheet.dataset.page = (opts && opts.page) || "";
   // An Epic page slides in from the right while the game behind it slides a little left and darkens.
   $("#sheetWrap").classList.toggle("epic", epic);
   $("#app").classList.toggle("pushed", epic);
@@ -4832,6 +5805,8 @@ function finishCloseSheet() {
   $("#app").classList.remove("pushed");
   $("#sheetBody").replaceChildren();
   $("#sheet").classList.remove("epic", "clean");
+  $("#sheet").dataset.page = "";
+  $("#sheetBody").classList.remove("nav-fwd", "nav-back");
   for (const old of $("#sheet").querySelectorAll(":scope > .sheet-bg, :scope > .sheet-extra")) old.remove();
   const f = sheetOnClose; sheetOnClose = null;
   if (f) f();
@@ -4860,6 +5835,13 @@ function openCardSheet(id, keepMusic) {
     toast(`Sold ${s.title} for ${fmtN(val)} coins`, "good");
     closeSheet();
   });
+  const plBtn = h("button", { class: "btn btn-ghost", type: "button" }, "Add to playlist");
+  plBtn.addEventListener("click", () => {
+    listBtn.hidden = false;
+    formSlot.replaceChildren(playlistChooser(c.k));
+    const body = formSlot.closest(".epic-opts-body");
+    if (body) body.scrollTop += formSlot.getBoundingClientRect().top - body.getBoundingClientRect().top - 12;
+  });
   const featured = state.featured.includes(c.id);
   const featBtn = h("button", { class: "btn btn-ghost", type: "button", onclick: () => {
     state.featured = state.featured.filter(f => f !== c.id && state.cards.some(x => x.id === f));   // drop songs you no longer have
@@ -4883,7 +5865,7 @@ function openCardSheet(id, keepMusic) {
     rarityPanel(c),
     auraPanel(c),
     mediaControls(c, r),
-    h("div", { class: "btn-row" }, listBtn, sellBtn, featBtn),
+    h("div", { class: "btn-row" }, listBtn, sellBtn, featBtn, plBtn),
     formSlot,
     details,
     listenRow(s),
@@ -4954,19 +5936,25 @@ function auraImage(r) {
   auraSrcs.set(r, auraSrc);
   return auraSrc;
 }
-// The glow's shape: a bright thin rim on the card's edge, a strong glow just outside it and a long soft fade.
-function auraMaskUrl(w, hh, r) {
+// The glow's shape. One-color glows: a bright thin rim on the card's edge, a strong glow just outside it and a long
+// soft fade. The rainbow glow is SoundMap's softer one, measured from its Epic page: about half strength at the
+// edge, fading evenly to nothing about 35px out, with only a faint rim.
+function auraMaskUrl(w, hh, r, soft) {
   const P = AURA_PAD, W = Math.round(w + 2 * P), H = Math.round(hh + 2 * P);
   const ring = (sw, extra) => `<rect x="${P}" y="${P}" width="${w}" height="${hh}" rx="${r}" ry="${r}" fill="none" stroke="#fff" stroke-width="${sw}" ${extra}/>`;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><defs>`
-    + `<filter id="f" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="13"/></filter>`
-    + `<filter id="n" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"/><feComponentTransfer><feFuncA type="linear" slope="1.35"/></feComponentTransfer></filter></defs>`
-    + ring(40, 'stroke-opacity=".62" filter="url(#f)"') + ring(20, 'filter="url(#n)"') + ring(3, "") + `</svg>`;
+  const head = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><defs>`;
+  const svg = soft
+    ? head + `<filter id="s" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="12"/></filter>`
+      + `<filter id="w" x="-25%" y="-25%" width="150%" height="150%"><feGaussianBlur stdDeviation="20"/></filter></defs>`
+      + ring(16, 'stroke-opacity=".25" filter="url(#w)"') + ring(16, 'stroke-opacity=".85" filter="url(#s)"') + ring(1.5, 'stroke-opacity=".35"') + `</svg>`
+    : head + `<filter id="f" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="13"/></filter>`
+      + `<filter id="n" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"/><feComponentTransfer><feFuncA type="linear" slope="1.35"/></feComponentTransfer></filter></defs>`
+      + ring(40, 'stroke-opacity=".62" filter="url(#f)"') + ring(20, 'filter="url(#n)"') + ring(3, "") + `</svg>`;
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 }
 let heroRO = null;
 function unwatchHero() { if (heroRO) { heroRO.disconnect(); heroRO = null; } }
-function watchHero(card, aura) {
+function watchHero(card, aura, soft) {
   unwatchHero();
   let last = "";
   const fit = () => {
@@ -4977,7 +5965,7 @@ function watchHero(card, aura) {
     const key = `${w}x${hh}r${r}`;
     if (key === last) return;
     last = key;
-    const url = auraMaskUrl(w, hh, r);
+    const url = auraMaskUrl(w, hh, r, soft);
     aura.style.webkitMaskImage = url;
     aura.style.maskImage = url;
     aura.hidden = false;
@@ -5017,10 +6005,11 @@ function epicHero(c) {
       h("div", { class: "hero-artist-row" }, h("div", { class: "hero-artist", text: s.artist }), play),
       h("div", { class: "hero-chips" }, epicChip,
         h("span", { class: "hchip hchip-genre", style: `--g:${g.color}` }, h("span", { class: "hchip-i", html: HERO_ICON.notes }), g.name))));
-  const spin = h("img", { class: "hero-spin", src: auraImage(auraOf(c)), alt: "" });
+  const glow = auraOf(c);
+  const spin = h("img", { class: "hero-spin", src: auraImage(glow), alt: "" });
   keepPhase(spin, AURA_SPIN_MS);
   const aura = h("div", { class: "hero-aura", "aria-hidden": "true", hidden: true }, spin);
-  watchHero(card, aura);
+  watchHero(card, aura, glow === 4);
   return h("div", { class: "hero r" + r }, aura, card);
 }
 // Just a back arrow, and the options button when there is one.
@@ -5034,9 +6023,14 @@ function epicTopBar(optionsBtn) {
 let epicOpts = null;
 function closeEpicOptions() {
   if (!epicOpts || epicOpts.el.hidden) return false;
-  epicOpts.el.hidden = true;
-  epicOpts.btn.setAttribute("aria-expanded", "false");
-  if (epicOpts.byKey) { try { epicOpts.btn.focus({ preventScroll: true }); } catch { /* ignore */ } }
+  const me = epicOpts, a = document.activeElement;
+  if (a && a !== document.body && me.el.contains(a) && a.blur) a.blur();   // the keyboard goes away with the panel
+  me.el.hidden = true;
+  if (me.btn) me.btn.setAttribute("aria-expanded", "false");
+  if (me.byKey && me.btn && me.btn.isConnected) { try { me.btn.focus({ preventScroll: true }); } catch { /* ignore */ } }
+  const after = me.onHide;
+  me.onHide = null;
+  if (after) after();
   return true;
 }
 function epicOptions(nodes) {
@@ -6175,13 +7169,288 @@ function renderQuests() {
 // =====================================================================
 // Profile
 // =====================================================================
+// SoundMap's profile page: a back arrow, Edit profile and a menu at the top; your picture, name, coins, level and
+// songs; then Achievements, Artist Badges, Showcase, Favorite Artists, Playlists and Collection, and an Offers
+// button floating at the bottom. Your own GIF, photo or video can sit behind it all.
+const PF_ICON = {
+  star: '<svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="pfStarG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6F8FB"/><stop offset="1" stop-color="#9DAABB"/></linearGradient></defs><path d="M12 1.6l3.1 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.4 5.6 21l1.5-7.1L1.7 9l7.2-.8z" fill="url(#pfStarG)" stroke="#7C899B" stroke-width=".9" stroke-linejoin="round"/><path d="M12 1.6v15.8L5.6 21l1.5-7.1L1.7 9l7.2-.8z" fill="#FFFFFF" opacity=".35"/></svg>',
+  brush: '<svg viewBox="0 0 24 24" aria-hidden="true"><g transform="rotate(45 12 12)"><rect x="9.3" y="1.2" width="5.4" height="7.8" rx="1.4" fill="#F4EFE7"/><rect x="8.9" y="8.6" width="6.2" height="3.1" rx=".5" fill="#A7B1BE"/><path d="M9.8 11.6h4.4l-.7 9.6a1.5 1.5 0 0 1-3 0z" fill="#E7A157"/></g></svg>',
+  disc: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.6" fill="#D5DDE7"/><path d="M12 12h10.6a10.6 10.6 0 0 1-5.3 9.2z" fill="#3D8CDD"/><circle cx="12" cy="12" r="4.2" fill="#F5F7FA"/><circle cx="12" cy="12" r="1.9" fill="#2A323D"/></svg>',
+  note: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3.5v11.3a3.6 3.6 0 1 0 2.2 3.3V8.4l5.6 1.9V6.2z" fill="#4C4C4C"/></svg>',
+  tile: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4.6l11-2.2v13.2a3.1 3.1 0 1 1-2-2.9V6.9l-7 1.4v9.4a3.1 3.1 0 1 1-2-2.9z" fill="currentColor"/></svg>',
+  chev: '<svg class="pf-chev" viewBox="0 0 9 14" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.6 1.5 7 7l-5.4 5.5"/></svg>',
+};
+// SoundMap's coin is pixel art: a gold coin with a dollar sign.
+const PF_COIN = (() => {
+  const rows = ["..oooooo..", ".oYYYYYYo.", "oYYYddYYYo", "oYYddddYYo", "oYYddYYYYo", "oYYYdddYYo", "oYYYYYddYo", "oYYddddYYo", ".oYYddYYo.", "..oooooo.."];
+  const col = { o: "#C46A00", Y: "#FFC21A", d: "#E08F00" };
+  let r = "";
+  rows.forEach((row, y) => [...row].forEach((ch, x) => { if (col[ch]) r += `<rect x="${x}" y="${y}" width="1.04" height="1.04" fill="${col[ch]}"/>`; }));
+  return `<svg viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;
+})();
+// 6,700 -> 6.7K, 228,014 -> 228K
+function fmtK(n) {
+  n = Math.max(0, Math.round(n || 0));
+  if (n < 1000) return String(n);
+  const [v, u] = n < 1e6 ? [n / 1000, "K"] : [n / 1e6, "M"];
+  return (v < 100 ? String(Math.floor(v * 10) / 10) : String(Math.floor(v))) + u;
+}
+// Your favorite artists: the ones in your showcase first, then the ones you have the most songs by.
+function artistRanking() {
+  const n = new Map(), boost = new Map();
+  for (const c of state.cards) { const s = SONG_BY_KEY.get(c.k); if (s) n.set(s.ak, (n.get(s.ak) || 0) + 1); }
+  for (const id of state.featured) { const c = state.cards.find(x => x.id === id); if (c) { const ak = SONG_BY_KEY.get(c.k).ak; boost.set(ak, (boost.get(ak) || 0) + 1); } }
+  return ARTISTS.filter(a => n.has(a.key))
+    .map(a => ({ a, n: n.get(a.key), b: boost.get(a.key) || 0 }))
+    .sort((x, y) => y.b - x.b || y.n - x.n || x.a.name.localeCompare(y.a.name));
+}
+// An artist's picture: your own cover for one of their songs (a showcase one first), else that song's art.
+function artistPic(a) {
+  const feat = new Set(state.featured.map(id => (state.cards.find(c => c.id === id) || {}).k));
+  const keys = a.songs.map(i => SONGS[i].key);
+  const k = keys.find(x => feat.has(x) && customCoverUrl(x)) || keys.find(x => customCoverUrl(x)) || keys.find(x => feat.has(x)) || keys[0];
+  return customCoverUrl(k) || coverURL(k);
+}
+// An artist's badge is yours once you have every one of their songs (or claimed their quest).
+function artistBadges(ranked) {
+  const owned = new Set(state.cards.map(c => c.k));
+  return ranked.filter(({ a }) => state.quests[a.key] || a.songs.every(i => owned.has(SONGS[i].key))).map(x => x.a);
+}
+function myRank(score) {
+  if (!(sharedOK && db) || !players.length) return 0;
+  const others = players.filter(p => p.id !== myId).map(p => p.score || 0);
+  return others.filter(v => v > score).length + 1;
+}
+function pfHead(icon, title, right, onClick) {
+  const tail = right === "chev" ? h("span", { html: PF_ICON.chev, style: "display:grid" }) : right === "see" ? h("span", { class: "pf-see", text: "See all" }) : right || null;
+  const el = h(onClick ? "button" : "div", { class: "pf-ch", type: onClick ? "button" : null },
+    h("span", { class: "pf-ch-i", html: icon.startsWith("<") ? icon : null, text: icon.startsWith("<") ? null : icon }),
+    h("span", { class: "pf-ch-t", text: title }), tail);
+  if (onClick) el.addEventListener("click", onClick);
+  return el;
+}
+// ---------- artist badges you make ----------
+// A badge is your picture of an artist with an outline that follows its shape (white like a sticker, as on SoundMap's
+// Artist Badges; gold like the one beside SoundMap names; black; or none) and any of four effects: a colored glow,
+// a holo shine that sweeps across it, twinkling sparkles, and a gentle float.
+const OUTLINE_COL = { white: "#FFFFFF", gold: "#F2C230", black: "#0B0B0B" };
+const OUTLINE_NAMES = { white: "Sticker", gold: "Gold", black: "Black", none: "None" };
+const FX_NAMES = { glow: "Glow", holo: "Holo shine", sparkle: "Sparkles", float: "Float" };
+const BADGE_GLOWS = ["#1CD055", "#B07CF5", "#FF5FA2", "#3DA5FF", "#F2C230", "#FFFFFF"];
+const SPARK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.5c.7 5.6 4.9 9.8 10.5 10.5-5.6.7-9.8 4.9-10.5 10.5C11.3 16.9 7.1 12.7 1.5 12 7.1 11.3 11.3 7.1 12 1.5z" fill="currentColor"/></svg>';
+// Next to your name a white sticker outline turns gold, like SoundMap's.
+function badgeFilter(b, mini) {
+  const o = mini ? 1.1 : 2.6, col = OUTLINE_COL[mini && b.ol === "white" ? "gold" : b.ol], parts = [];
+  if (col) parts.push(`drop-shadow(${o}px 0 0 ${col})`, `drop-shadow(-${o}px 0 0 ${col})`, `drop-shadow(0 ${o}px 0 ${col})`, `drop-shadow(0 -${o}px 0 ${col})`);
+  if (b.fx.includes("glow")) parts.push(`drop-shadow(0 0 ${mini ? 2.5 : 6}px ${b.gc})`, `drop-shadow(0 0 ${mini ? 5 : 14}px ${b.gc})`);
+  if (!mini) parts.push("drop-shadow(0 5px 9px rgba(0,0,0,.45))");
+  return parts.join(" ") || "none";
+}
+function badgeEl(b, opts) {
+  const mini = !!(opts && opts.mini), url = (opts && opts.url) || mediaUrl("badge", b.id);
+  const wrap = h("span", { class: "bdg" + (mini ? " mini" : "") + (b.cut ? " cut" : " round") + (!mini && b.fx.includes("float") ? " float" : ""), title: b.name || null });
+  wrap.append(h("img", { src: url, alt: b.name ? b.name + " badge" : "Artist badge", style: `filter:${badgeFilter(b, mini)}` }));
+  if (b.fx.includes("holo") && url) {
+    const holo = h("span", { class: "bdg-holo", "aria-hidden": "true" });
+    if (b.cut) { holo.style.webkitMaskImage = `url("${url}")`; holo.style.maskImage = `url("${url}")`; }
+    wrap.append(holo);
+  }
+  if (!mini && b.fx.includes("sparkle")) for (let i = 0; i < 4; i++) wrap.append(h("span", { class: "bdg-spark s" + i, "aria-hidden": "true", html: SPARK }));
+  return wrap;
+}
+const pinnedBadge = () => state.badges.find(b => b.pin) || state.badges[0] || null;
+const fxText = b => [OUTLINE_NAMES[b.ol] + (b.ol === "none" ? " outline" : ""), ...b.fx.map(f => FX_NAMES[f])].join(" · ");
+const newBadgeId = () => "b" + (Date.now().toString(36) + Math.random().toString(36).slice(2)).replace(/[^a-z0-9]/g, "").slice(-10);
+// Artist Badges: the ones you've made, with a way to make more.
+function openBadges() {
+  const pin = pinnedBadge();
+  const rows = state.badges.map(b => {
+    const star = h("button", { class: "bdg-pin" + (b === pin ? " on" : ""), type: "button", "aria-pressed": String(b === pin), "aria-label": `Show ${b.name || "this badge"} next to my name`, title: "Next to my name", text: "★" });
+    star.addEventListener("click", () => { for (const x of state.badges) x.pin = x === b; markDirty(); renderMe(); openBadges(); });
+    const edit = h("button", { class: "btn btn-ghost btn-sm", type: "button" }, "Edit");
+    edit.addEventListener("click", () => openBadgeEditor(b.id));
+    return h("div", { class: "bdg-row" }, h("span", { class: "bdg-row-prev" }, badgeEl(b)),
+      h("div", { class: "bdg-row-info" }, h("b", { text: b.name || "Artist badge" }), h("span", { text: fxText(b) })),
+      h("div", { class: "bdg-row-acts" }, star, edit));
+  });
+  openSheet([h("h2", { text: "Artist Badges" }),
+    h("p", { class: "muted", text: "Make your own: pick a picture of an artist, then give it an outline and effects. The starred one sits next to your name." }),
+    rows.length ? h("div", { class: "bdg-list" }, rows) : h("p", { class: "hint", text: "You haven't made one yet. Until you do, artists you've collected every song by show here." }),
+    state.badges.length < BADGE_MAX ? h("div", { class: "btn-row" }, h("button", { class: "btn btn-primary", type: "button", onclick: () => openBadgeEditor() }, "Make a badge"))
+      : h("p", { class: "hint", text: `You have ${BADGE_MAX} badges, the most there's room for. Delete one to make another.` }),
+    h("p", { class: "hint", text: "Tip: a picture with no background looks like a sticker. On an iPhone, press and hold the person in a photo, tap Share, then Save Image, and pick that picture here." })],
+  "Artist Badges");
+}
+function openBadgeEditor(id) {
+  const old = id ? state.badges.find(b => b.id === id) : null;
+  const draft = old ? { ...old, fx: [...old.fx] } : { id: newBadgeId(), name: "", ol: "white", fx: [], gc: BADGE_GLOWS[0], pin: !state.badges.length, cut: false };
+  let pic = null, picUrl = "";
+  const stage = h("div", { class: "bdg-stage" });
+  const paint = () => {
+    const url = picUrl || (old ? mediaUrl("badge", old.id) : "");
+    stage.replaceChildren(url ? badgeEl(draft, { url }) : h("span", { class: "bdg-empty", text: "Choose a picture to start" }));
+  };
+  const status = h("div", { class: "hint", role: "status" });
+  const say = (t, bad) => { status.className = bad ? "msg bad" : "hint"; status.textContent = t || ""; };
+  const input = h("input", { type: "file", accept: "image/*", id: "badgeFile", class: "sr", tabindex: "-1", "aria-hidden": "true" });
+  const pick = h("button", { class: "btn btn-ghost btn-sm", type: "button" }, old ? "Change picture" : "Choose picture");
+  pick.addEventListener("click", () => input.click());
+  input.addEventListener("change", async () => {
+    const f = input.files && input.files[0];
+    input.value = "";
+    if (!f) return;
+    say("Getting your picture ready…");
+    try {
+      pic = await prepareBadgeImage(f);
+      if (picUrl) URL.revokeObjectURL(picUrl);
+      picUrl = URL.createObjectURL(pic.blob);
+      draft.cut = pic.cut;
+      say(pic.cut ? "A cut-out: the outline follows its shape." : "A photo: it shows in a circle. A picture with no background looks like a sticker.");
+      paint();
+    } catch (e) { say(mediaErrorText(e, "cover"), true); }
+  });
+  const nameIn = h("input", { class: "input", id: "badgeName", type: "text", maxlength: "40", list: "badgeArtists", placeholder: "Artist", autocomplete: "off", "aria-label": "Artist" });
+  nameIn.value = draft.name;
+  nameIn.addEventListener("input", () => { draft.name = cleanText(nameIn.value, 40); });
+  const names = h("datalist", { id: "badgeArtists" }, ARTISTS.map(a => h("option", { value: a.name })));
+  const olRow = h("div", { class: "rar-pick", role: "radiogroup", "aria-label": "Outline" });
+  const fxRow = h("div", { class: "rar-pick", role: "group", "aria-label": "Effects" });
+  const gcRow = h("div", { class: "gc-pick", role: "radiogroup", "aria-label": "Glow color" });
+  const paintControls = () => {
+    olRow.replaceChildren(...BADGE_OUTLINES.map(o => {
+      const on = draft.ol === o;
+      const b = h("button", { class: "rar-opt bdg-opt" + (on ? " on" : ""), type: "button", role: "radio", "aria-checked": String(on), style: `--rc:${OUTLINE_COL[o] || "#848484"}` },
+        h("span", { class: "rar-dot" + (o === "none" ? " hollow" : "") }), OUTLINE_NAMES[o]);
+      b.addEventListener("click", () => { draft.ol = o; paintControls(); paint(); });
+      return b;
+    }));
+    fxRow.replaceChildren(...BADGE_FX.map(f => {
+      const on = draft.fx.includes(f);
+      const b = h("button", { class: "rar-opt fx-opt" + (on ? " on" : ""), type: "button", "aria-pressed": String(on) }, FX_NAMES[f]);
+      b.addEventListener("click", () => { draft.fx = on ? draft.fx.filter(x => x !== f) : [...draft.fx, f]; paintControls(); paint(); });
+      return b;
+    }));
+    gcRow.hidden = !draft.fx.includes("glow");
+    gcRow.replaceChildren(...BADGE_GLOWS.map(c => {
+      const on = draft.gc === c;
+      const b = h("button", { class: "gc-sw" + (on ? " on" : ""), type: "button", role: "radio", "aria-checked": String(on), "aria-label": "Glow color " + c, style: `--c:${c}` });
+      b.addEventListener("click", () => { draft.gc = c; paintControls(); paint(); });
+      return b;
+    }));
+  };
+  const pinSw = h("button", { class: "switch", type: "button", role: "switch", "aria-checked": String(!!draft.pin), "aria-label": "Show next to my name" });
+  pinSw.addEventListener("click", () => { draft.pin = !draft.pin; pinSw.setAttribute("aria-checked", String(draft.pin)); });
+  const save = h("button", { class: "btn btn-primary", type: "button" }, old ? "Save badge" : "Make badge");
+  save.addEventListener("click", async () => {
+    if (!pic && !old) { say("Choose a picture first.", true); return; }
+    save.disabled = true;
+    const clean = { id: draft.id, name: cleanText(nameIn.value, 40), ol: draft.ol, fx: draft.fx.filter(f => BADGE_FX.includes(f)), gc: draft.gc, pin: !!draft.pin, cut: !!draft.cut };
+    const i = state.badges.findIndex(b => b.id === clean.id), before = i >= 0 ? state.badges[i] : null;
+    if (i >= 0) state.badges[i] = clean; else state.badges.push(clean);
+    if (clean.pin) for (const b of state.badges) if (b !== clean) b.pin = false;
+    try {
+      if (pic) await saveMedia("badge", clean.id, pic.blob, pic.type, t => say(t), { m: pic.type });
+    } catch (e) {
+      // the picture couldn't be kept: put things back as they were
+      if (before) state.badges[i] = before; else state.badges = state.badges.filter(b => b.id !== clean.id);
+      save.disabled = false;
+      say(mediaErrorText(e, "cover"), true);
+      return;
+    }
+    markDirty();
+    saveNow();
+    if (picUrl) { URL.revokeObjectURL(picUrl); picUrl = ""; }
+    toast(old ? "Badge saved" : "Badge made", "good");
+    renderMe();
+    openBadges();
+  });
+  const del = old ? confirmButton("Delete", "Tap again to delete", "btn btn-ghost", async () => {
+    state.badges = state.badges.filter(b => b.id !== old.id);
+    markDirty();
+    await removeMedia("badge", old.id);
+    toast("Badge deleted");
+    renderMe();
+    openBadges();
+  }) : null;
+  const field = (label, ...kids) => h("div", { class: "bdg-field" }, h("span", { class: "eyebrow", text: label }), ...kids);
+  openSheet([h("h2", { text: old ? "Edit badge" : "Make a badge" }), stage,
+    h("div", { class: "row" }, pick), input,
+    field("Artist", nameIn, names),
+    field("Outline", olRow),
+    field("Effects", fxRow, gcRow),
+    h("div", { class: "setting" }, h("div", null, h("b", null, "Next to my name"), h("div", { class: "hint", text: "Shows this badge beside your username." })), pinSw),
+    status, h("div", { class: "btn-row" }, save, del)], old ? "Edit badge" : "Make a badge");
+  paintControls();
+  paint();
+}
+let prevTab = "map", pfBgSig = "";
+function paintProfileBg() {
+  const box = $("#pfBg"), url = profileMediaUrl("pbg"), type = profileMediaType("pbg");
+  $("#panel-me").classList.toggle("has-bg", !!url);
+  const sig = url ? url + "|" + type : "";
+  if (sig === pfBgSig) return;
+  pfBgSig = sig;
+  for (const v of box.querySelectorAll("video")) { try { v.pause(); v.removeAttribute("src"); v.load(); } catch { /* ignore */ } }
+  box.replaceChildren();
+  if (!url) return;
+  if (/^video\//.test(type)) {
+    const v = h("video", { src: url, muted: true, loop: true, playsinline: true, autoplay: true, preload: "auto" });
+    v.muted = true; v.defaultMuted = true;
+    box.append(v);
+    if (curTab === "me") playVideo(v);
+  } else box.append(h("img", { src: url, alt: "", decoding: "async" }));
+}
+function profileBgPlay(on) {
+  const v = $("#pfBg video");
+  if (!v) return;
+  if (on) playVideo(v); else { try { v.pause(); } catch { /* ignore */ } }
+}
 function renderMe() {
-  const st = computeStats(), L = levelOf(state.xp), a = xpForLevel(L), b = xpForLevel(L + 1);
+  const st = computeStats(), L = levelOf(state.xp);
   const name = state.username || (meInfo && meInfo.name) || "You";
-  const ava = meInfo && meInfo.avatarUrl
-    ? h("img", { class: "pava", src: meInfo.avatarUrl, alt: "" })
-    : h("div", { class: "pava", style: "display:grid;place-items:center;font:900 34px/1 var(--f-display);color:var(--blue)", text: name.charAt(0).toUpperCase() });
-  $("#meMeta").replaceChildren(h("div", null, mode === "synced" ? "Saved to your account" : "Saved on this device"));
+  paintProfileBg();
+  const ranked = artistRanking();
+  const pic = profileMediaUrl("pava") || (meInfo && meInfo.avatarUrl) || "";
+  const head = h("div", { class: "pf-head" },
+    h("div", { class: "pf-ava" }, pic ? h("img", { src: pic, alt: "" }) : name.charAt(0).toUpperCase()),
+    h("div", { class: "pf-id" },
+      h("div", { class: "pf-name" }, h("b", { text: name }), pinnedBadge() ? badgeEl(pinnedBadge(), { mini: true })
+        : ranked[0] ? h("img", { class: "pf-mini", src: artistPic(ranked[0].a), alt: "", title: ranked[0].a.name }) : null),
+      h("div", { class: "pf-line" },
+        h("span", { class: "pf-li", title: "Coins" }, h("span", { html: PF_COIN }), fmtN(state.coins)),
+        h("span", { class: "pf-li", title: "Level" }, h("span", { class: "pf-emo", text: "👑" }), `Lv. ${L}`),
+        h("span", { class: "pf-li", title: "Songs" }, h("span", { class: "pf-emo", text: "💿" }), fmtN(st.cards)))));
+  const rank = myRank(st.score);
+  const ach = h("div", { class: "pf-card" }, pfHead(PF_ICON.star, "Achievements", "chev", openAchievements),
+    h("div", { class: "pf-ach" },
+      h("span", { title: "Trades" }, h("span", { class: "pf-emo", text: "🔁" }), fmtK((state.stats.sold || 0) + (state.stats.bought || 0))),
+      h("span", { title: "Crate score" }, h("span", { class: "pf-emo", text: "👑" }), fmtK(st.score)),
+      h("span", { title: "Leaderboard rank" }, rank ? "#" + rank : "# -")));
+  // your own badges; until you make one, the artists you've collected every song by
+  const earned = state.badges.length ? [] : artistBadges(ranked).slice(0, 3);
+  const shown = state.badges.length ? state.badges.map(b => badgeEl(b))
+    : earned.map(a => badgeEl({ id: "", name: a.name, ol: "white", fx: [], gc: "", cut: false }, { url: artistPic(a) }));
+  const badgeBox = h("div", { class: "pf-badges" + (shown.length > 3 ? " many" : "") },
+    shown.length ? shown : h("p", { class: "pf-none", text: "Make your own badge, or collect every song by an artist to earn theirs." }));
+  badgeBox.addEventListener("click", openBadges);
+  const badge = h("div", { class: "pf-card" }, pfHead(PF_ICON.brush, "Artist Badges", "chev", openBadges), badgeBox);
+  const fav = h("button", { class: "pf-card pf-fav", type: "button", "aria-label": "Favorite Artists" },
+    h("span", { class: "pf-ch-i", text: "💚" }), h("span", { class: "pf-ch-t", text: "Favorite Artists" }),
+    h("span", { class: "pf-favs" }, ranked.slice(0, 3).map(x => h("img", { src: artistPic(x.a), alt: "", title: x.a.name }))),
+    h("span", { html: PF_ICON.chev, style: "display:grid" }));
+  fav.addEventListener("click", openFavorites);
+  const toCrate = () => setTab("crate");
+  const plays = playlistsCard();
+  const recent = [...state.cards].sort((x, y) => y.t - x.t).slice(0, 10);
+  const coll = h("div", { class: "pf-card" }, pfHead(PF_ICON.note, "Collection", "see", toCrate),
+    recent.length ? h("div", { class: "pf-coll" }, recent.map(songRow)) : h("div", { class: "pf-badges" }, h("p", { class: "pf-none", text: "Songs you collect show up here." })));
+  const since = new Date(state.created || now()).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  const foot = h("p", { class: "pf-foot" }, "You've been with Cratewalk since", h("br"), `${since} 🤍`);
+  $("#meBody").replaceChildren(head, ach, badge, showcaseSection(), fav, plays, coll, foot);
+}
+// Achievements: everything you've done, your medals and the leaderboard.
+function openAchievements() {
+  const st = computeStats(), L = levelOf(state.xp), a = xpForLevel(L), b = xpForLevel(L + 1);
   const stat = (v, l) => h("div", { class: "stat" }, h("b", null, v), h("span", null, l));
   const medals = [];
   for (const k of state.medals) { const s = SONG_BY_KEY.get(k); medals.push(h("span", { class: "medal epic" }, h("span", { text: "Epic finder · " + s.title }))); }
@@ -6189,37 +7458,116 @@ function renderMe() {
     const ar = ARTISTS.find(x => x.key === ak);
     if (ar) medals.push(h("span", { class: "medal" }, h("span", { class: "gdot", style: `--gc:${GENRES[ar.genre].color}` }), h("span", { text: ar.name + " complete" })));
   }
-  const sound = h("button", { class: "switch", type: "button", role: "switch", "aria-checked": String(state.sound), "aria-label": "Sound effects" });
-  sound.addEventListener("click", () => { state.sound = !state.sound; markDirty(); if (state.sound) { ensureAudio(); sfx("coin"); } renderMe(); });
-  $("#meBody").replaceChildren(
-    h("div", { class: "section" }, h("div", { class: "profile" }, ava,
-      h("div", { style: "display:grid;gap:6px;min-width:0" },
-        nameEditing ? nameEditor() : h("div", { class: "pname-row" }, h("div", { class: "pname", text: name }),
-          h("button", { class: "pname-edit", type: "button", "aria-label": "Change username", html: ICON.pencil, onclick: () => { nameEditing = true; nameDraft = state.username || (meInfo && meInfo.name) || ""; renderMe(); } })),
-        h("div", { class: "muted small", text: `Level ${L} · ${fmtN(state.xp - a)} of ${fmtN(b - a)} XP to level ${L + 1}` }),
-        h("div", { class: "bar", style: `--v:${((state.xp - a) / Math.max(1, b - a)).toFixed(3)}` }, h("i"))))),
-    h("div", { class: "section" }, h("div", { class: "stats" },
+  openSheet([h("h2", { text: "Achievements" }),
+    h("div", { class: "muted small", text: `Level ${L} · ${fmtN(state.xp - a)} of ${fmtN(b - a)} XP to level ${L + 1}` }),
+    h("div", { class: "bar", style: `--v:${((state.xp - a) / Math.max(1, b - a)).toFixed(3)}` }, h("i")),
+    h("div", { class: "stats" },
       stat(fmtN(state.coins), "Coins"), stat(fmtN(st.cards), "Songs"), stat(fmtN(st.uniques), "Unique"),
       stat(fmtN(st.shiny), "Shiny"), stat(fmtN(st.epic), "Epic"), stat(fmtN(st.firsts), "#1 copies"),
       stat(fmtN(state.stats.opened || 0), "Drops opened"), stat(fmtDist(state.stats.walked || 0), "Walked"),
-      stat(String(state.streak.count || 0), "Day streak"), stat(fmtN(st.score), "Crate score"))),
-    showcaseSection(),
-    h("div", { class: "section" },
-      h("div", { class: "section-title" }, "Medals", h("small", null, String(medals.length))),
-      medals.length ? h("div", { class: "medals" }, medals) : h("p", { class: "hint", text: "Find an Epic or finish an artist quest to earn your first medal." })),
-    leaderboardSection(),
-    h("div", { class: "section" }, h("div", { class: "section-title" }, "Settings"), h("div", null,
-      h("div", { class: "setting" }, h("div", null, h("b", null, "Sound effects"), h("div", { class: "hint", text: "Short chimes when you open drops and trade." })), sound),
-      h("div", { class: "setting" }, h("div", null, h("b", null, "How to play"), h("div", { class: "hint", text: "See the three-step intro again." })),
-        h("button", { class: "btn btn-ghost btn-sm", type: "button", onclick: () => showOnboarding(0) }, "Show")),
-      h("div", { class: "setting setting-save" }, h("div", null, h("b", null, "Move your save"),
-          h("div", { class: "hint", text: "Copy your save code here, then paste it into the other copy of Cratewalk (Claude or your Home Screen). Songs, coins, rarities, auras, your showcase and username come along. Videos, covers, backgrounds and music need adding again." })),
-        h("div", { class: "row save-btns" },
-          h("button", { class: "btn btn-ghost btn-sm", type: "button", onclick: copySave }, "Copy save code"),
-          h("button", { class: "btn btn-ghost btn-sm", type: "button", onclick: pasteSave }, "Paste a code"))),
-      h("div", { class: "setting" }, h("div", null, h("b", null, "Start over"), h("div", { class: "hint", text: "Clears your crate, coins and quests." })),
-        confirmButton("Reset", "Tap again to reset", "btn btn-ghost btn-sm", resetProgress)))));
-  fillNames($("#meBody"));
+      stat(String(state.streak.count || 0), "Day streak"), stat(fmtN((state.stats.sold || 0) + (state.stats.bought || 0)), "Trades"),
+      stat(fmtN(st.score), "Crate score")),
+    h("div", { class: "section-title" }, "Medals", h("small", null, String(medals.length))),
+    medals.length ? h("div", { class: "medals" }, medals) : h("p", { class: "hint", text: "Find an Epic or finish an artist quest to earn your first medal." }),
+    leaderboardSection()], "Achievements");
+  fillNames($("#sheetBody"));
+}
+function openFavorites() {
+  const ranked = artistRanking().slice(0, 12);
+  openSheet([h("h2", { text: "Favorite Artists" }),
+    h("p", { class: "muted", text: "Artists in your showcase come first, then the ones you have the most songs by." }),
+    ranked.length ? h("div", { class: "pf-artists" }, ranked.map(({ a, n }) => h("div", { class: "pf-artist" },
+      h("img", { src: artistPic(a), alt: "" }), h("b", { text: a.name }), h("span", { text: `${fmtN(n)} song${n === 1 ? "" : "s"}` }))))
+      : h("p", { class: "hint", text: "Collect some songs and your favorite artists show up here." })], "Favorite Artists");
+}
+// The menu: sound, the intro, moving your save, starting over.
+function openProfileSettings() {
+  const sound = h("button", { class: "switch", type: "button", role: "switch", "aria-checked": String(state.sound), "aria-label": "Sound effects" });
+  sound.addEventListener("click", () => { state.sound = !state.sound; markDirty(); if (state.sound) { ensureAudio(); sfx("coin"); } sound.setAttribute("aria-checked", String(state.sound)); });
+  openSheet([h("h2", { text: "Settings" }), h("div", null,
+    h("div", { class: "setting" }, h("div", null, h("b", null, "Sound effects"), h("div", { class: "hint", text: "Short chimes when you open drops and trade." })), sound),
+    h("div", { class: "setting" }, h("div", null, h("b", null, "How to play"), h("div", { class: "hint", text: "See the three-step intro again." })),
+      h("button", { class: "btn btn-ghost btn-sm", type: "button", onclick: () => { closeSheet(); showOnboarding(0); } }, "Show")),
+    h("div", { class: "setting setting-save" }, h("div", null, h("b", null, "Move your save"),
+        h("div", { class: "hint", text: STANDALONE
+          ? "To bring your game over from Claude, tap Save to a file there and choose Save to Files. Then tap Load a save file here and pick it. Songs, coins, rarities, auras, your showcase, playlists and username come along. Videos, covers, backgrounds and music need adding again."
+          : "Tap Save to a file and choose Save to Files. Then open Cratewalk on your Home Screen, tap Load a save file and pick it. Songs, coins, rarities, auras, your showcase, playlists and username come along. Videos, covers, backgrounds and music need adding again." })),
+      h("div", { class: "save-btns" },
+        canSaveFile() ? h("button", { class: "btn btn-primary btn-sm", type: "button", onclick: saveToFile }, "Save to a file") : null,
+        h("button", { class: "btn " + (canSaveFile() ? "btn-ghost" : "btn-primary") + " btn-sm", type: "button", onclick: loadSaveFile }, "Load a save file"),
+        h("button", { class: "btn btn-ghost btn-sm", type: "button", onclick: copySave }, "Copy code"),
+        h("button", { class: "btn btn-ghost btn-sm", type: "button", onclick: pasteSave }, "Paste code"))),
+    h("div", { class: "setting" }, h("div", null, h("b", null, "Start over"), h("div", { class: "hint", text: "Clears your crate, coins and quests." })),
+      confirmButton("Reset", "Tap again to reset", "btn btn-ghost btn-sm", () => { closeSheet(); resetProgress(); }))),
+    h("p", { class: "hint", text: mode === "synced" ? "Your game is saved to your account." : "Your game is saved on this device." })], "Settings");
+}
+// Edit profile: your username, your picture and the background behind your profile.
+// After a save, the sheet is redrawn only if you're still looking at it.
+function refreshEditor() { if (!$("#sheetWrap").hidden && $("#sheet").getAttribute("aria-label") === "Edit profile") openProfileEditor(); }
+const PE_HINT = "GIFs keep moving, and videos play silently on a loop.";
+function openProfileEditor() {
+  const status = h("div", { class: "hint", role: "status" }, PE_HINT);
+  const say = (t, bad) => { status.className = bad ? "msg bad" : "hint"; status.textContent = t == null ? PE_HINT : t; };
+  const inp = h("input", { class: "input", id: "pfNameIn", type: "text", maxlength: "20", "aria-label": "Username", autocomplete: "nickname", enterkeyhint: "done", spellcheck: "false" });
+  inp.value = state.username || (meInfo && meInfo.name) || "";
+  const saveName = () => {
+    const v = cleanName(inp.value);
+    inp.value = v;
+    if (v !== state.username) {
+      state.username = v;
+      markDirty();
+      schedulePlayerDoc(true);
+      toast(v ? `Username set to ${v}` : "Username cleared", "good");
+      renderMe();
+    }
+    inp.blur();
+  };
+  inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); saveName(); } });
+  const row = kind => {
+    const isBg = kind === "pbg", url = profileMediaUrl(kind), type = profileMediaType(kind);
+    const prev = h("div", { class: "pe-prev" + (isBg ? " wide" : "") });
+    if (url) {
+      if (/^video\//.test(type)) { const v = h("video", { src: url, muted: true, loop: true, playsinline: true, autoplay: true }); v.muted = true; prev.append(v); playVideo(v); }
+      else prev.append(h("img", { src: url, alt: "" }));
+    } else if (!isBg) prev.append((state.username || (meInfo && meInfo.name) || "Y").charAt(0).toUpperCase());
+    const input = h("input", { type: "file", accept: isBg ? "image/*,video/mp4,video/quicktime,video/webm,video/*" : "image/*", id: isBg ? "pfBgFile" : "pfAvaFile", class: "sr", tabindex: "-1", "aria-hidden": "true" });
+    const pick = h("button", { class: "btn btn-ghost btn-sm", type: "button" }, url ? "Change" : "Choose");
+    pick.addEventListener("click", () => input.click());
+    input.addEventListener("change", async () => {
+      const f = input.files && input.files[0];
+      input.value = "";
+      if (!f) return;
+      pick.disabled = true;
+      try {
+        const where = await setProfileMedia(kind, f, t => say(t));
+        toast(`${isBg ? "Background" : "Picture"} set${where === "device" ? " on this device" : ""}`, "good");
+        renderMe();
+        refreshEditor();
+      } catch (e) {
+        pick.disabled = false;
+        say(mediaErrorText(e, kind), true);
+      }
+    });
+    const remove = url ? confirmButton("Remove", "Tap again", "btn btn-ghost btn-sm", async () => {
+      await removeMedia(kind, PROFILE_KEY[kind]);
+      toast(isBg ? "Background removed" : "Picture removed");
+      renderMe();
+      refreshEditor();
+    }) : null;
+    return h("div", { class: "pe-row" }, prev,
+      h("div", { class: "pe-info" }, h("b", null, isBg ? "Background" : "Profile picture"),
+        h("span", null, isBg ? (url ? (/^video\//.test(type) ? "Your video" : type === "image/gif" ? "Your GIF" : "Your image") + (mediaOrigin(kind, PROFILE_KEY[kind]) === "device" ? " · this device only" : "") : "A GIF, photo or video behind your profile")
+          : (url ? "Your picture" : "A photo, a GIF or a PNG"))),
+      h("div", { class: "pe-acts" }, pick, remove), input);
+  };
+  openSheet([h("h2", { text: "Edit profile" }),
+    h("div", { class: "pe-name" }, h("label", { class: "eyebrow", for: "pfNameIn", text: "Username" }),
+      h("div", { class: "row" }, inp, h("button", { class: "btn btn-primary btn-sm", type: "button", onclick: saveName }, "Save"))),
+    h("div", null, row("pava"), row("pbg"),
+      h("div", { class: "pe-row" }, h("div", { class: "pe-prev" }, pinnedBadge() ? badgeEl(pinnedBadge(), { mini: true }) : h("span", { html: PF_ICON.brush, style: "width:24px;height:24px;display:grid" })),
+        h("div", { class: "pe-info" }, h("b", null, "Artist badges"), h("span", null, state.badges.length ? `${state.badges.length} made` : "Make your own, with effects")),
+        h("div", { class: "pe-acts" }, h("button", { class: "btn btn-ghost btn-sm", type: "button", onclick: openBadges }, "Open")))),
+    status], "Edit profile");
 }
 // =====================================================================
 // Showcase: up to 12 of your songs in a dark case, three tall cards across. Each card plays your video
@@ -6236,8 +7584,7 @@ function showcaseSection() {
   const slots = [];
   scEl = h("div", { class: "section sc-wrap" },
     h("div", { class: "showcase" },
-      h("div", { class: "sc-head" }, h("span", { class: "sc-spark", html: SC_SPARK }), h("span", { class: "sc-name", text: "Showcase" }),
-        feat.length ? h("span", { class: "sc-count", text: `${feat.length} of ${SHOWCASE_MAX}` }) : null),
+      h("div", { class: "sc-head" }, h("span", { class: "sc-spark", html: SC_SPARK }), h("span", { class: "sc-name", text: "Showcase" })),
       feat.length ? h("div", { class: "sc-grid" }, feat.map(c => showcaseCard(c, slots)))
         : h("p", { class: "sc-empty", text: `Show off up to ${SHOWCASE_MAX} songs here. Open a song and tap Add to showcase. On an Epic, it's under Options.` })));
   scSig = sig;
@@ -6301,36 +7648,13 @@ function dropShowcase() {
   if (scEl) stopMediaIn(scEl);
   scEl = null; scSig = ""; scSlots = [];
 }
-// Your username: shown on your profile and, for other players, on the leaderboard.
-let nameEditing = false, nameDraft = "";
-function nameEditor() {
-  const inp = h("input", { class: "input pname-input", type: "text", maxlength: "20", value: nameDraft, "aria-label": "Username", autocomplete: "nickname", enterkeyhint: "done", spellcheck: "false" });
-  const done = keep => {
-    nameEditing = false;
-    if (keep) {
-      const v = cleanName(inp.value);
-      if (v !== state.username) {
-        state.username = v;
-        markDirty();
-        schedulePlayerDoc(true);
-        toast(v ? `Username set to ${v}` : "Username cleared", "good");
-      }
-    }
-    renderMe();
-  };
-  inp.addEventListener("input", () => { nameDraft = inp.value; });
-  inp.addEventListener("keydown", e => {
-    if (e.key === "Enter") { e.preventDefault(); done(true); }
-    else if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); done(false); }
-  });
-  setTimeout(() => { if (inp.isConnected) { try { inp.focus(); inp.select(); } catch { /* ignore */ } } }, 30);
-  return h("div", { class: "pname-edit-row" }, inp,
-    h("div", { class: "row" },
-      h("button", { class: "btn btn-primary btn-sm", type: "button", onclick: () => done(true) }, "Save"),
-      h("button", { class: "btn btn-ghost btn-sm", type: "button", onclick: () => done(false) }, "Cancel")));
-}
-// Moving a save between the Claude copy and the Home Screen copy: one line of text you copy and paste.
+// Your username is edited in Edit profile; nothing redraws the profile from under you while you type there.
+let nameEditing = false;
+// Moving a save between the Claude copy and the Home Screen copy. A save file is the sure way: the Claude copy hands
+// it to the iPhone's share sheet (Save to Files), and the Home Screen copy opens it from Files. The save code, one
+// line of text to copy and paste, stays as a second way.
 const SAVE_CODE_TAG = "CRATEWALK1:";
+const SAVE_FILE_KIND = "cratewalk-save";
 function saveCode() {
   const bytes = new TextEncoder().encode(JSON.stringify(packState(state)));
   let bin = "";
@@ -6347,36 +7671,150 @@ function readSaveCode(text) {
     return sanitizeState(JSON.parse(new TextDecoder().decode(bytes)));
   } catch { return null; }
 }
-async function copySave() {
-  const code = saveCode();
+// a save file's text, or a save code: either one loads
+function readSaveText(text) {
+  const t = String(text || "").replace(/^﻿/, "").trim();
+  if (t.includes(SAVE_CODE_TAG)) return readSaveCode(t);
   try {
-    await navigator.clipboard.writeText(code);
-    toast("Save code copied. Paste it into the other Cratewalk.", "good");
+    const o = JSON.parse(t);
+    const raw = o && o.kind === SAVE_FILE_KIND ? o.save : o;
+    if (raw && typeof raw === "object" && Array.isArray(raw.cards)) return sanitizeState(raw);
+  } catch { /* not a save */ }
+  return null;
+}
+function saveFileName() {
+  const d = new Date(), p2 = n => String(n).padStart(2, "0");
+  return `cratewalk-save-${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}.json`;
+}
+const saveFileText = () => JSON.stringify({ kind: SAVE_FILE_KIND, version: 1, saved: new Date().toISOString(), save: packState(state) });
+// The Claude copy saves files through the page's downloads permission; the Home Screen copy through the share sheet.
+let downloadsCap;   // undefined until asked, null when this copy can't save files that way
+function downloadsReady() {
+  if (downloadsCap !== undefined) return Promise.resolve(downloadsCap);
+  const C = window.claude;
+  if (!C || typeof C.use !== "function") return Promise.resolve(downloadsCap = null);
+  return C.use("downloads").then(d => (downloadsCap = d || null)).catch(() => (downloadsCap = null));
+}
+const canSaveFile = () => !!downloadsCap || STANDALONE;
+function saveToFile() {
+  const name = saveFileName(), text = saveFileText();
+  if (downloadsCap) {
+    downloadsCap.save({ filename: name, data: text }).then(() => {
+      toast("Save file made. In Cratewalk on your Home Screen, tap Load a save file.", "good", 5200);
+    }).catch(e => {
+      const code = e && e.code;
+      if (code === "declined") return;
+      if (code === "rate_limited") toast("A save file is already waiting for you to confirm.", "", 3600);
+      else toast("Saving a file isn't available here. Use Copy code instead.", "bad", 4200);
+    });
     return;
-  } catch { /* copying isn't allowed here: show it to copy by hand */ }
-  const ta = h("textarea", { class: "input save-code", readonly: true, rows: "7", "aria-label": "Your save code" });
-  ta.value = code;
-  openSheet([h("h2", { text: "Your save code" }), h("p", { class: "muted", text: "Tap the box, then Select All and Copy." }), ta], "Your save code");
-  setTimeout(() => { try { ta.focus(); ta.select(); } catch { /* ignore */ } }, 80);
+  }
+  // the Home Screen copy: the share sheet (Save to Files), else an ordinary download
+  const file = new File([text], name, { type: "application/json" });
+  if (navigator.canShare && navigator.share) {
+    let ok = false;
+    try { ok = navigator.canShare({ files: [file] }); } catch { ok = false; }
+    if (ok) {
+      navigator.share({ files: [file], title: "Cratewalk save" }).catch(e => {
+        if (!e || e.name !== "AbortError") toast("Sharing didn't work. Try Copy code instead.", "bad", 3600);
+      });
+      return;
+    }
+  }
+  const url = URL.createObjectURL(file);
+  const a = h("a", { href: url, download: name, class: "sr" });
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+  toast("Save file downloaded.", "good");
+}
+function loadSaveFile() {
+  // no file-type filter: some iPhones grey out a .json file when the picker is told to look for one
+  const inp = h("input", { type: "file", class: "sr", tabindex: "-1", "aria-hidden": "true" });
+  inp.addEventListener("change", async () => {
+    const f = inp.files && inp.files[0];
+    inp.remove();
+    if (!f) return;
+    if (f.size > 8 * 1048576) { toast("That file is too big to be a Cratewalk save.", "bad", 3600); return; }
+    let text = "";
+    try { text = await f.text(); } catch { toast("Couldn't open that file. Try again.", "bad"); return; }
+    const s = readSaveText(text);
+    if (!s) { toast("That file isn't a Cratewalk save. Pick the one named cratewalk-save.", "bad", 4200); return; }
+    confirmLoad(s);
+  });
+  document.body.append(inp);
+  inp.click();
+}
+function confirmLoad(s) {
+  const who = s.username ? ` for ${s.username}` : "";
+  const go = h("button", { class: "btn btn-primary", type: "button" }, "Load this save");
+  go.addEventListener("click", () => applySave(s));
+  openSheet([h("h2", { text: "Load this save?" }),
+    h("p", { class: "muted", text: `A save${who} with ${fmtN(s.cards.length)} songs and ${fmtN(s.coins)} coins. It replaces the game in this copy of Cratewalk.` }),
+    h("div", { class: "btn-row" }, go, h("button", { class: "btn btn-ghost", type: "button", onclick: closeSheet }, "Cancel"))], "Load this save?");
+}
+function applySave(s) {
+  s.onboarded = true;
+  state = s;
+  applyStateToWorld();
+  markDirty();
+  saveNow();
+  closeSheet();
+  toast(`Save loaded: ${fmtN(state.cards.length)} songs`, "good");
+  setTab("me");
+  maybeGrantEpics().catch(() => {});
+}
+// Copying the code: the clipboard if this copy may use it, then the older copy command, then the code on screen.
+function copyByCommand(text) {
+  const ta = h("textarea", { "aria-hidden": "true", style: "position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;font-size:16px" });
+  ta.value = text;
+  document.body.append(ta);
+  let ok = false;
+  try { ta.focus({ preventScroll: true }); ta.setSelectionRange(0, text.length); ok = document.execCommand("copy"); } catch { ok = false; }
+  ta.remove();
+  return ok;
+}
+function copySave() {
+  const code = saveCode();
+  const done = () => toast("Save code copied. Paste it into the other Cratewalk.", "good");
+  const show = () => {
+    if (copyByCommand(code)) { done(); return; }
+    const ta = h("textarea", { class: "input save-code", readonly: true, rows: "6", "aria-label": "Your save code" });
+    ta.value = code;
+    const again = h("button", { class: "btn btn-primary", type: "button" }, "Copy");
+    again.addEventListener("click", () => {
+      if (copyByCommand(code)) { done(); closeSheet(); return; }
+      ta.focus(); ta.setSelectionRange(0, code.length);
+      toast("Press and hold the selected code, then tap Copy.", "", 4200);
+    });
+    openSheet([h("h2", { text: "Your save code" }),
+      h("p", { class: "muted", text: "Copy this, then paste it into the other Cratewalk. If copying won't work here, use Save to a file instead." }),
+      ta, h("div", { class: "btn-row" }, again)], "Your save code");
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(code).then(done, show);
+  else show();
 }
 function pasteSave() {
-  const ta = h("textarea", { class: "input save-code", rows: "7", placeholder: "Paste your save code here", "aria-label": "Save code" });
+  const ta = h("textarea", { class: "input save-code", rows: "5", placeholder: "Paste your save code here", "aria-label": "Save code", autocomplete: "off", autocorrect: "off", autocapitalize: "off", spellcheck: "false" });
   const msg = h("div", { class: "hint", role: "status" });
-  const go = h("button", { class: "btn btn-primary", type: "button" }, "Load this save");
-  go.addEventListener("click", () => {
-    const s = readSaveCode(ta.value);
+  const load = text => {
+    const s = readSaveText(text);
     if (!s) { msg.className = "msg bad"; msg.textContent = "That doesn't look like a Cratewalk save code. Copy it again and paste the whole thing."; return; }
-    s.onboarded = true;
-    state = s;
-    applyStateToWorld();
-    markDirty();
-    saveNow();
-    closeSheet();
-    toast(`Save loaded: ${fmtN(state.cards.length)} songs`, "good");
-    setTab("me");
-    maybeGrantEpics().catch(() => {});
+    applySave(s);
+  };
+  const go = h("button", { class: "btn btn-primary", type: "button" }, "Load this save");
+  go.addEventListener("click", () => load(ta.value));
+  // On the Home Screen the game may read the clipboard when you tap (the iPhone asks first); inside Claude it can't.
+  const canRead = STANDALONE && navigator.clipboard && typeof navigator.clipboard.readText === "function";
+  const fromClip = canRead ? h("button", { class: "btn btn-ghost", type: "button" }, "Paste from clipboard") : null;
+  if (fromClip) fromClip.addEventListener("click", () => {
+    navigator.clipboard.readText().then(t => { ta.value = t || ""; load(ta.value); }, () => {
+      msg.className = "hint"; msg.textContent = "Tap the box, then tap Paste.";
+    });
   });
-  openSheet([h("h2", { text: "Paste a save code" }), h("p", { class: "muted", text: "This replaces the save in this copy of the game with the one you copied." }), ta, msg, h("div", { class: "btn-row" }, go)], "Paste a save code");
+  openSheet([h("h2", { text: "Paste a save code" }), h("p", { class: "muted", text: "This replaces the save in this copy of the game with the one you copied." }),
+    ta, msg, h("div", { class: "btn-row" }, fromClip, go)], "Paste a save code");
 }
 function leaderboardSection() {
   const sec = h("div", { class: "section" }, h("div", { class: "section-title" }, "Leaderboard", h("small", null, "Crate score")));
@@ -6554,9 +7992,123 @@ function tick() {
     if (housePeriod() !== houseCache.p) { houseStock(); pruneHouse(); if (curTab === "market") renderMarket(); }
   }
 }
+/* ---------- fill the phone screen ---------- */
+// The game is one fixed screen, edge to edge. iOS can leave it pushed up after the keyboard closes or the app comes
+// back from the background, with an empty band at the bottom, so snap it back whenever nothing is being typed.
+function typingNow() {
+  const a = document.activeElement;
+  if (!a || a === document.body || a.readOnly) return false;
+  if (a.tagName === "TEXTAREA" || a.isContentEditable) return true;
+  return a.tagName === "INPUT" && !/^(button|checkbox|radio|range|file|color|submit|reset)$/i.test(a.type || "");
+}
+// Typing: the game holds still. It doesn't zoom (text fields are 16px and the page can't be pinched), it isn't
+// pushed up, and an open sheet rides just above the keyboard so what you type stays in view.
+const COARSE = typeof matchMedia === "function" && matchMedia("(pointer: coarse)").matches;
+let restH = 0, guessKb = 0;
+const layoutHeight = () => document.documentElement.clientHeight || innerHeight;
+const inLiftable = el => !!(el && el.closest && el.closest("#sheet:not(.epic), .epic-opts-panel"));
+function releaseStill() {
+  const app = $("#app");
+  if (!app.classList.contains("kb-open") && !app.style.height) return;
+  app.classList.remove("kb-open");
+  app.style.transform = ""; app.style.height = ""; app.style.bottom = "";
+  document.documentElement.style.removeProperty("--kb");
+}
+function holdStill() {
+  if (!typingNow()) { releaseStill(); restH = layoutHeight(); return; }
+  const app = $("#app"), vv = window.visualViewport;
+  const H = restH || layoutHeight();
+  let kb = vv ? Math.round(H - vv.height) : 0;
+  const top = vv ? Math.max(0, Math.round(vv.offsetTop)) : 0;
+  if (kb < 80) kb = guessKb;          // no keyboard measured here: the guess, for a field in a sheet
+  if (kb < 80) { releaseStill(); return; }
+  // the game keeps its full height and stays put on screen; iOS's push upward is undone
+  app.style.height = H + "px"; app.style.bottom = "auto";
+  app.style.transform = top ? `translateY(${top}px)` : "";
+  document.documentElement.style.setProperty("--kb", kb + "px");
+  app.classList.add("kb-open");
+}
+// Pinch and double-tap never zoom the page. The map and the video framing tool still zoom themselves.
+function noPageZoom() {
+  const stop = e => e.preventDefault();
+  for (const t of ["gesturestart", "gesturechange", "gestureend"]) document.addEventListener(t, stop, { passive: false });
+}
+function settleScreen() {
+  if (typingNow()) return;
+  if (window.scrollX || window.scrollY) window.scrollTo(0, 0);
+  for (const el of [document.documentElement, document.body, $("#app")]) {
+    if (el && (el.scrollTop || el.scrollLeft)) { el.scrollTop = 0; el.scrollLeft = 0; }
+  }
+}
+// On a Home Screen app some iOS 26 versions report no safe areas at all. Then the page puts in the phone's own
+// numbers: the tab bar clears the home bar, and the top chips clear the clock when the page runs under it.
+// iPhone 13 Pro Max (428 x 926): 47 at the top, 34 at the bottom.
+const IPHONE_APP = /iPhone|iPod/.test(navigator.userAgent) && navigator.standalone === true;
+const NOTCH_TOP = { "375x812": 47, "390x844": 47, "428x926": 47, "414x896": 48, "393x852": 59, "430x932": 59, "402x874": 62, "440x956": 62 };
+let insetProbe = null;
+function reportedInsets() {
+  if (!insetProbe) {
+    insetProbe = h("div", { "aria-hidden": "true", style: "position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)" });
+    document.body.append(insetProbe);
+  }
+  const cs = getComputedStyle(insetProbe);
+  return { top: parseFloat(cs.paddingTop) || 0, bottom: parseFloat(cs.paddingBottom) || 0 };
+}
+function fitScreen() {
+  if (!IPHONE_APP || typingNow()) return;
+  const root = document.documentElement.style;
+  const portrait = innerHeight > innerWidth, sw = Math.min(screen.width, screen.height), sh = Math.max(screen.width, screen.height);
+  // a phone with a home bar, held upright; anything else keeps what iOS reports
+  if (!portrait || sh < 812) { root.removeProperty("--sat"); root.removeProperty("--sab"); return; }
+  const got = reportedInsets(), kept = sh - innerHeight;   // what iOS keeps for its own bars
+  // the page reaches the bottom of the screen, so the home bar sits on top of it
+  if (got.bottom === 0 && kept < 70) root.setProperty("--sab", "34px"); else root.removeProperty("--sab");
+  // the page covers the whole screen, so the clock sits on top of it too
+  if (got.top === 0 && kept <= 1) root.setProperty("--sat", (NOTCH_TOP[sw + "x" + sh] || 47) + "px");
+  else root.removeProperty("--sat");
+}
+// Inside the Claude iPhone app the game stops short of the screen's bottom edge (the app keeps the strip by the home
+// bar for itself), yet the phone still reports the home bar's space. Counting it again left a gap under the tab bar,
+// so when the game clearly ends above the bottom edge, that space is dropped.
+function trimHostInset() {
+  if (STANDALONE || typingNow()) return;
+  const root = document.documentElement.style, got = reportedInsets();
+  const sh = Math.max(screen.width, screen.height), short = sh - innerHeight;
+  const above = COARSE && innerHeight > innerWidth && got.top > 0 && got.bottom > 0 && short >= 28 && short <= 64;
+  if (above) root.setProperty("--sab", "0px"); else root.removeProperty("--sab");
+}
+// The Home Screen copy opened in a Safari tab has Safari's bars around it; say how to get the full screen.
+function homeScreenTip() {
+  if (!STANDALONE) return;
+  const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const app = navigator.standalone === true || matchMedia("(display-mode: standalone)").matches || matchMedia("(display-mode: fullscreen)").matches;
+  if (ios && !app) setTimeout(() => toast("For full screen, open Cratewalk from your Home Screen. In Safari: ••• › Share › Add to Home Screen.", "", 7000), 1200);
+}
+function bindScreenFit() {
+  const calm = () => { holdStill(); if (!typingNow()) { fitScreen(); trimHostInset(); settleScreen(); } };
+  noPageZoom();
+  document.addEventListener("focusin", e => {
+    if (!typingNow()) return;
+    // a field in a sheet on a phone: lift the sheet before the keyboard arrives, so iOS has no reason to push the page
+    guessKb = COARSE && inLiftable(e.target) ? Math.round((restH || layoutHeight()) * 0.42) : 0;
+    holdStill();
+  });
+  document.addEventListener("focusout", () => setTimeout(() => { if (!typingNow()) guessKb = 0; calm(); }, 80));
+  if (window.visualViewport) { visualViewport.addEventListener("resize", calm); visualViewport.addEventListener("scroll", calm); }
+  addEventListener("resize", () => setTimeout(calm, 60));
+  addEventListener("orientationchange", () => setTimeout(calm, 350));
+  addEventListener("pageshow", calm);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) setTimeout(calm, 120); });
+  calm();
+}
 function bindUI() {
+  bindScreenFit();
   $$(".tab").forEach(b => b.addEventListener("click", () => { ensureAudio(); setTab(b.dataset.tab); }));
   $("#hudMe").addEventListener("click", () => setTab("me"));
+  $("#pfBack").addEventListener("click", () => setTab(prevTab && prevTab !== "me" ? prevTab : "map"));
+  $("#pfEdit").addEventListener("click", openProfileEditor);
+  $("#pfMore").addEventListener("click", openProfileSettings);
+  $("#pfOffers").addEventListener("click", () => { marketSeg = "offers"; setTab("market"); });
   $("#zoomIn").addEventListener("click", () => zoomBy(1.3));
   $("#zoomOut").addEventListener("click", () => zoomBy(1 / 1.3));
   $("#recenter").addEventListener("click", () => setFollow(true));
@@ -6591,6 +8143,8 @@ function start(hot) {
   setInterval(tick, 1000);
   if (typeof hot.tab === "string" && ["crate", "market", "quests", "me"].includes(hot.tab)) setTab(hot.tab);
   if (!state.onboarded) showOnboarding(0);
+  homeScreenTip();
+  downloadsReady().then(d => { if (d && curTab === "me" && !nameEditing) renderMe(); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { cache.valid = false; coverCache.clear(); });
   loadLocalMedia();
   const hk = window.claude && window.claude.hot;
