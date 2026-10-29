@@ -22,7 +22,7 @@ if ("serviceWorker" in navigator) addEventListener("load", () => { navigator.ser
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
 /* Layout: the street map is the home screen, edge to edge. HUD chips float on it, a five-tab bar sits at the
    bottom, panels (Crate, Market, Quests, Me) slide over the map, and sheets rise from the bottom for drops and cards.
@@ -261,10 +261,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .section { display: grid; gap: 10px; margin-bottom: 26px; }
 /* ---------- Showcase: a dark case on your profile, three tall cards across ---------- */
 .showcase { container-type: inline-size; background: #1B1B1B; border-radius: 20px; padding: 0 20px 20px; color: #FFFFFF; }
-.sc-head { display: flex; align-items: center; gap: 5px; height: 51px; margin: 0 -5px 0 -3px; color: #848484; font: 600 16px/1.2 var(--f-body); }
-button.sc-head { appearance: none; width: calc(100% + 8px); padding: 0; border: 0; background: none; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.sc-head { display: flex; align-items: center; gap: 5px; box-sizing: border-box; height: 51px; padding-top: 1.44px; margin: 0 -5px 0 -3px; color: #848484; font: 600 15.3px/1.2 var(--f-body); letter-spacing: -.005em; }
+button.sc-head { appearance: none; width: calc(100% + 8px); padding: 1.44px 0 0; border: 0; background: none; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 button.sc-head:active { opacity: .7; }
-.sc-spark svg { width: 14px; height: 14px; display: block; }
+.sc-spark { width: 14px; height: 14px; display: grid; place-items: center; }
+.sc-spark svg { width: 18.8px; height: 18.8px; margin: -2.4px; display: block; flex: none; }
 .sc-name { flex: 1; }
 .sc-count { color: #6F6F74; font-size: 12px; font-variant-numeric: tabular-nums; }
 .sc-empty { margin: 0; color: #9B9B9F; font-size: 14px; line-height: 1.45; display: grid; gap: 12px; justify-items: start; }
@@ -274,30 +275,32 @@ button.sc-head:active { opacity: .7; }
 .sc-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; --per: 3; }
 @container (min-width: 540px) { .sc-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); --per: 4; } }
 @container (min-width: 760px) { .sc-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); --per: 6; } }
-.sc-card { container-type: inline-size; position: relative; display: block; width: 100%; aspect-ratio: 109 / 160; padding: 0; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.sc-card { container-type: inline-size; position: relative; display: block; width: 100%; aspect-ratio: 41 / 60; padding: 0; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .sc-card { grid-column: span var(--s3, 2); }
 @container (min-width: 540px) { .sc-card { grid-column: span var(--s4, 2); } }
 @container (min-width: 760px) { .sc-card { grid-column: span var(--s6, 2); } }
-.sc-media { position: absolute; inset: 0; overflow: hidden; border-radius: 9.5cqw; background: #000000; isolation: isolate; transition: opacity .12s ease; }
+.sc-media { position: absolute; inset: 0; overflow: hidden; border-radius: 10.92cqw; background: #000000; isolation: isolate; transition: opacity .12s ease; }
 .sc-media > img, .sc-media > video, .sc-media > canvas { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; display: block; }
 .sc-media > .vid-load { left: 50%; top: 42%; bottom: auto; transform: translate(-50%, -50%); padding: 5px; gap: 0; font-size: 0; }
 .sc-media > .vid-load span:not(.spin) { display: none; }
 .sc-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,.4)); pointer-events: none; }
-.sc-info { position: absolute; left: 6.7cqw; right: 6cqw; bottom: 6.2cqw; display: grid; justify-items: start; gap: 5.4cqw; }
-.sc-title { max-width: 100%; padding-left: 2.7cqw; color: #FFFFFF; font: 800 8.9cqw/1.15 var(--f-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 3px rgba(0,0,0,.45); }
-.sc-chip { display: inline-flex; align-items: center; gap: 3cqw; height: 9.3cqw; padding: 0 3.4cqw; border-radius: 999px; color: #FFFFFF; font: 700 6.5cqw/1 var(--f-body); white-space: nowrap; background: var(--rc); }
-.sc-chip-i svg { width: 4.6cqw; height: 4.6cqw; display: block; }
+.sc-info { position: absolute; left: 7.317cqw; right: 9.19cqw; bottom: 6.704cqw; display: grid; justify-items: start; gap: 5.14cqw; }
+.sc-title { max-width: 100%; padding-left: 1.875cqw; color: #FFFFFF; font: 800 8.323cqw/1.15 var(--f-body); letter-spacing: .025em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 3px rgba(0,0,0,.45); }
+.sc-chip { display: inline-flex; align-items: center; gap: 2.131cqw; height: 9.146cqw; padding: 0 3.449cqw; border-radius: 999px; color: #FFFFFF; font: 700 4.939cqw/1 var(--f-body); letter-spacing: .025em; white-space: nowrap; background: var(--rc); }
+.sc-chip.sc-epic { padding-left: 2.835cqw; }
+.sc-chip-i svg { width: 6.22cqw; height: 6.22cqw; display: block; }
 .sc-chip.sc-epic { background: linear-gradient(90deg, hsl(var(--eh) 72% 60%), hsl(calc(var(--eh) + 45) 68% 60%)); text-shadow: 0 1px 1px rgba(0,0,0,.18); animation: chip-hue 4.8s linear infinite; }
 /* SoundMap's number: a short, tall pill with heavy type, over the card's corner */
-.sc-no { position: absolute; top: -6px; right: -6px; z-index: 2; display: grid; place-items: center; box-sizing: border-box; height: 18px; min-width: 23.5px; padding: 0 6px; border-radius: 9px; background: #FFFFFF; color: #000000; font: 900 10px/1 var(--f-body); white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+.sc-no { position: absolute; top: -6px; right: -6px; z-index: 2; display: grid; place-items: center; box-sizing: border-box; height: 18px; min-width: 23.67px; padding: 2px 5.5px 0 6px; border-radius: 9px; background: #FFFFFF; color: #000000; font: 900 10.5px/1 var(--f-body); letter-spacing: -.077em; font-variant-numeric: tabular-nums; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
 /* Big and wide cards: as tall as a small card, with the song, its rarity and its number the same size as on a small
    one (--scu is a hundredth of a small card's width). The small cards above are untouched. */
-.sc-card:is(.sz-b, .sz-w) { aspect-ratio: auto; --scu: calc((100cqw - (var(--per) - 1) * 10px) / var(--per) / 100); height: calc(var(--scu) * 100 * 160 / 109); }
-.sc-card:is(.sz-b, .sz-w) .sc-media { border-radius: calc(9.5 * var(--scu)); }
-.sc-card:is(.sz-b, .sz-w) .sc-info { left: calc(6.7 * var(--scu)); right: calc(6 * var(--scu)); bottom: calc(6.2 * var(--scu)); gap: calc(5.4 * var(--scu)); }
-.sc-card:is(.sz-b, .sz-w) .sc-title { padding-left: calc(2.7 * var(--scu)); font-size: calc(8.9 * var(--scu)); }
-.sc-card:is(.sz-b, .sz-w) .sc-chip { gap: calc(3 * var(--scu)); height: calc(9.3 * var(--scu)); padding: 0 calc(3.4 * var(--scu)); font-size: calc(6.5 * var(--scu)); }
-.sc-card:is(.sz-b, .sz-w) .sc-chip-i svg { width: calc(4.6 * var(--scu)); height: calc(4.6 * var(--scu)); }
+.sc-card:is(.sz-b, .sz-w) { aspect-ratio: auto; --scu: calc((100cqw - (var(--per) - 1) * 10px) / var(--per) / 100); height: calc(var(--scu) * 100 * 60 / 41); }
+.sc-card:is(.sz-b, .sz-w) .sc-media { border-radius: calc(10.92 * var(--scu)); }
+.sc-card:is(.sz-b, .sz-w) .sc-info { left: calc(7.317 * var(--scu)); right: calc(9.19 * var(--scu)); bottom: calc(6.704 * var(--scu)); gap: calc(5.14 * var(--scu)); }
+.sc-card:is(.sz-b, .sz-w) .sc-title { padding-left: calc(1.875 * var(--scu)); font-size: calc(8.323 * var(--scu)); }
+.sc-card:is(.sz-b, .sz-w) .sc-chip { gap: calc(2.131 * var(--scu)); height: calc(9.146 * var(--scu)); padding: 0 calc(3.449 * var(--scu)); font-size: calc(4.939 * var(--scu)); }
+.sc-card:is(.sz-b, .sz-w) .sc-chip.sc-epic { padding-left: calc(2.835 * var(--scu)); }
+.sc-card:is(.sz-b, .sz-w) .sc-chip-i svg { width: calc(6.22 * var(--scu)); height: calc(6.22 * var(--scu)); }
 .sc-card:active .sc-media { opacity: .55; transition: none; }
 .sc-card:focus-visible { outline: none; }
 .sc-card:focus-visible .sc-media { box-shadow: 0 0 0 2px #1B1B1B, 0 0 0 4px var(--blue); }
@@ -458,7 +461,7 @@ button.sc-head:active { opacity: .7; }
 .srow-thumb > img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 7px; background: var(--raise); }
 /* SoundMap's #1 bubble, measured from it: 23.5 x 18 for "#1" (the digits 7 tall), its top 6 above the picture and
    its right end 6 past it; the same size on every picture, big or small */
-.srow-no { position: absolute; top: -6px; right: -6px; display: grid; place-items: center; box-sizing: border-box; height: 18px; min-width: 23.5px; padding: 0 6px; border-radius: 9px; background: #FFFFFF; color: #000000; font: 900 10px/1 var(--f-body); white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+.srow-no { position: absolute; top: -6px; right: -6px; display: grid; place-items: center; box-sizing: border-box; height: 18px; min-width: 23.67px; padding: 2px 5.5px 0 6px; border-radius: 9px; background: #FFFFFF; color: #000000; font: 900 10.5px/1 var(--f-body); letter-spacing: -.077em; font-variant-numeric: tabular-nums; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
 .srow-info { min-width: 0; display: grid; justify-items: start; gap: 2px; }
 .srow-t { max-width: 100%; color: var(--ink); font: 800 16px/1.25 var(--f-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .srow-a { max-width: 100%; color: #E4E4E4; font: 500 14px/1.3 var(--f-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -469,6 +472,7 @@ button.sc-head:active { opacity: .7; }
 .rchip { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 10px 0 8px; border-radius: 999px; font: 700 12px/1 var(--f-body); white-space: nowrap; color: var(--rc); background: color-mix(in srgb, var(--rc) 16%, transparent); }
 .rchip-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 .rchip-i svg { width: 13px; height: 13px; display: block; }
+.rchip:not(.rchip-epic) .rchip-i svg { width: 11px; height: 11px; }
 .rchip.rchip-epic { color: #FFFFFF; padding: 0 11px 0 9px; background: linear-gradient(90deg, hsl(var(--eh) 55% 58%), hsl(calc(var(--eh) + 50) 50% 64%)); text-shadow: 0 1px 1px rgba(0,0,0,.15); animation: chip-hue 4.8s linear infinite; }
 
 /* ---------- list rows (market) ---------- */
@@ -546,42 +550,50 @@ button.sc-head:active { opacity: .7; }
 .pf-panel.has-bg .pf-ava { box-shadow: 0 2px 10px rgba(0,0,0,.35); }
 .pf-top {
   position: relative; z-index: 2; flex: none; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box;
-  height: calc(var(--sat) + 40px); padding: var(--sat) max(21px, env(safe-area-inset-right, 0px)) 0 max(12px, env(safe-area-inset-left, 0px));
+  height: calc(var(--sat) + 40px); padding: var(--sat) max(19.72px, env(safe-area-inset-right, 0px)) 0 max(12px, env(safe-area-inset-left, 0px));
 }
-.pf-back { appearance: none; width: 44px; height: 40px; padding: 0 0 0 7px; margin-top: 2px; border: 0; background: none; color: #FFFFFF; display: grid; place-items: center start; }
-.pf-back svg { width: 22px; height: 22px; display: block; margin-left: -2px; }
-.pf-actions { display: flex; align-items: center; gap: 7px; margin-top: 2px; }
+.pf-back { appearance: none; width: 44px; height: 40px; padding: 0 0 0 7px; margin-top: 4px; border: 0; background: none; color: #FFFFFF; display: grid; place-items: center start; }
+.pf-back svg { width: 23px; height: 23px; display: block; margin-left: -1.6px; }
+.pf-actions { display: flex; align-items: center; gap: 6.27px; margin-top: 4px; }
 .pf-pill { appearance: none; height: 23.5px; padding: 0 11px; border: 0; border-radius: 999px; background: #1CD055; color: #000000; font: 800 13.5px/1 var(--f-body); white-space: nowrap; }
-.pf-more { appearance: none; width: 22.5px; height: 22.5px; padding: 0; border: 0; border-radius: 50%; background: #1B1B1B; color: #848484; display: grid; place-items: center; }
+.pf-more { appearance: none; width: 24.5px; height: 24.5px; padding: 0; border: 0; border-radius: 50%; background: #1B1B1B; color: #848484; display: grid; place-items: center; }
 .pf-more svg { width: 17px; height: 17px; display: block; }
 .pf-back:active, .pf-pill:active, .pf-more:active, .pf-offers:active { opacity: .6; }
 .pf-body { position: relative; z-index: 1; padding: 0 max(20px, env(safe-area-inset-right, 0px)) calc(var(--sab) + 120px) max(20px, env(safe-area-inset-left, 0px)); }
 .pf-body .section { margin-bottom: 16px; gap: 0; }
+.pf-body .sc-wrap { margin-top: -1px; margin-bottom: 15px; }
 .pf-head { display: flex; align-items: center; gap: 16px; padding: 13px 0; }
 .pf-ava { position: relative; width: 72px; height: 72px; flex: none; border-radius: 50%; overflow: hidden; background: #1B1B1B; display: grid; place-items: center; color: #FFFFFF; font: 800 30px/1 var(--f-body); }
 .pf-ava img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; }
-.pf-id { min-width: 0; display: grid; gap: 4px; }
+.pf-id { min-width: 0; display: grid; gap: 5.5px; margin-top: -4.44px; }
 .pf-name { display: flex; align-items: center; gap: 6px; min-width: 0; }
-.pf-name b { min-width: 0; font: 800 20px/1.2 var(--f-body); color: #FFFFFF; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pf-name b { min-width: 0; font: 800 20.5px/1.2 var(--f-body); color: #FFFFFF; letter-spacing: -.005em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pf-mini { width: 22px; height: 22px; flex: none; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 1.5px #F2C230; }
-.pf-line { display: flex; align-items: center; gap: 15px; color: #848484; font: 600 14px/1.2 var(--f-body); white-space: nowrap; font-variant-numeric: tabular-nums; }
-.pf-li { display: inline-flex; align-items: center; gap: 6px; }
+.pf-line { display: flex; align-items: center; gap: 15px; color: #848484; font: 600 13.4px/1.2 var(--f-body); letter-spacing: -.01em; white-space: nowrap; }
+.pf-li { display: inline-flex; align-items: center; gap: 5px; }
 .pf-emo { font-size: 14px; line-height: 1; }
-.pf-li svg { width: 13px; height: 13px; display: block; }
+.pf-li svg { width: 14px; height: 14px; display: block; }
 .pf-card { background: #1B1B1B; border-radius: 20px; margin-bottom: 16px; color: #FFFFFF; }
-.pf-ch { display: flex; align-items: center; gap: 5px; height: 52px; padding: 0 15px 0 17px; color: #848484; font: 600 16px/1.2 var(--f-body); }
+.pf-ch { display: flex; align-items: center; gap: 5px; box-sizing: border-box; height: 52px; padding: .8px 15px 0 17px; color: #848484; font: 600 15.3px/1.2 var(--f-body); letter-spacing: -.005em; }
+/* the headers with "See all" sit a point lower, like SoundMap's */
+.pf-ch:has(.pf-see) { padding-top: 2.86px; }
 .pf-ch-i { flex: none; width: 14px; height: 14px; display: grid; place-items: center; font-size: 13px; line-height: 1; }
-.pf-ch-i svg { width: 14px; height: 14px; display: block; }
+.pf-ch-i svg { width: 14px; height: 14px; display: block; flex: none; }
+/* sized so each picture covers what SoundMap's does */
+.pf-ch-i svg.pfi-star { width: 16px; height: 16px; margin: -1px; }
+.pf-ch-i svg.pfi-brush { width: 17.5px; height: 17.5px; margin: -1.75px; transform: translate(-.5px, 1.17px); }
+.pf-ch-i svg.pfi-disc { width: 14.73px; height: 14.73px; margin: -.365px; }
+.pf-ch-i svg.pfi-note { width: 19.25px; height: 19.25px; margin: -2.625px; }
 .pf-ch-t { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 button.pf-ch, button.pf-fav, button.pf-pl { appearance: none; border: 0; width: 100%; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 button.pf-ch, button.pf-pl { background: none; }
 button.pf-ch { color: #848484; }
 button.pf-fav { background: #1B1B1B; }
 button.pf-ch:active, button.pf-fav:active, button.pf-pl:active { opacity: .7; }
-.pf-chev { flex: none; width: 9px; height: 14px; color: #848484; display: block; }
-.pf-see { appearance: none; border: 0; background: none; padding: 6px 2px 6px 8px; margin-right: -2px; color: #848484; font: 600 14px/1 var(--f-body); }
-.pf-ach { display: flex; align-items: center; justify-content: space-between; height: 34px; padding: 0 36px 18px 30px; box-sizing: content-box; }
-.pf-ach span { display: inline-flex; align-items: center; gap: 8px; font: 800 24px/1 var(--f-body); color: #FFFFFF; font-variant-numeric: tabular-nums; }
+.pf-chev { flex: none; width: 8.28px; height: 12.88px; color: #848484; display: block; }
+.pf-see { appearance: none; border: 0; background: none; padding: 6px 2px 6px 8px; margin-right: -1.33px; color: #848484; font: 500 12.7px/1 var(--f-body); letter-spacing: 0; }
+.pf-ach { display: flex; align-items: center; justify-content: space-between; height: 34px; padding: 1.1px 36px 16.9px 30px; box-sizing: content-box; }
+.pf-ach span { display: inline-flex; align-items: center; gap: 8px; font: 800 22.5px/1 var(--f-body); letter-spacing: -.03em; color: #FFFFFF; font-variant-numeric: tabular-nums; }
 .pf-ach .pf-emo { font-size: 21px; }
 .pf-badges { position: relative; height: 100px; margin-top: -1px; padding-bottom: 20px; box-sizing: content-box; display: flex; justify-content: center; align-items: center; }
 .pf-badges { gap: 16px; cursor: pointer; }
@@ -639,32 +651,34 @@ button.pf-ch:active, button.pf-fav:active, button.pf-pl:active { opacity: .7; }
 .bdg-pin { width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%; background: var(--raise); color: var(--ink-3); font: 700 17px/1 var(--f-body); }
 .bdg-pin.on { color: #F2C230; background: color-mix(in srgb, #F2C230 18%, var(--raise)); }
 .pf-none { margin: 0; padding: 0 17px; color: #848484; font: 500 14px/1.4 var(--f-body); text-align: center; }
-.pf-fav { display: flex; align-items: center; gap: 5px; height: 57px; padding: 0 15px 0 17px; color: #848484; font: 600 16px/1.2 var(--f-body); }
-.pf-favs { display: flex; gap: 9px; margin-right: 15px; }
-.pf-favs img { width: 23px; height: 23px; border-radius: 50%; object-fit: cover; background: #2A2A2A; }
+.pf-fav { display: flex; align-items: center; gap: 5px; box-sizing: border-box; height: 58px; padding: .8px 15px 0 17px; color: #848484; font: 600 15.3px/1.2 var(--f-body); letter-spacing: -.005em; }
+.pf-favs { display: flex; gap: 8px; margin-right: 15px; }
+.pf-favs img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; background: #2A2A2A; }
 /* Playlists on the profile: SoundMap's 69pt dark tiles, each with its name and song count beside it */
-.pf-pls { display: grid; gap: 14px; padding: 0 17px 20.5px 24px; }
+.pf-pls { display: grid; gap: 14px; padding: 0 17px 20px 24px; }
 .pf-pl { display: flex; align-items: center; gap: 21px; padding: 0; min-width: 0; color: #FFFFFF; }
-.pf-tile { width: 69px; height: 69px; flex: none; border-radius: 4px; background: #151515; color: #FFFFFF; display: grid; place-items: center; overflow: hidden; }
+.pf-tile { width: 70px; height: 70px; flex: none; border-radius: 4px; background: #151515; color: #FFFFFF; display: grid; place-items: center; overflow: hidden; }
 .pf-tile svg { width: 17px; height: 17px; }
 .pf-pl-info { min-width: 0; display: grid; gap: 4px; }
 .pf-pl-info b { font: 700 16px/1.2 var(--f-body); color: #FFFFFF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pf-pl-info span { font: 600 14px/1.2 var(--f-body); color: #848484; font-variant-numeric: tabular-nums; }
 .pf-pl-new .pf-tile svg { width: 22px; height: 22px; }
-.pf-coll { padding: 1px 0 0; }
+.pf-coll { padding: 0; }
 /* each song: cover top-aligned, words from 2pt below its top, one song every 92pt */
-.pf-coll .srow { margin-bottom: 17.85px; }
-.pf-coll .srow-main { align-items: flex-start; gap: 21px; padding: 0 0 0 25px; }
-.pf-coll .srow-info { gap: 0; padding-top: 2px; }
-.pf-coll .srow-thumb { width: 69px; height: 69px; }
+.pf-coll .srow { margin-bottom: 16.03px; }
+.pf-coll .srow-main { align-items: flex-start; gap: 20.1px; padding: 0 0 0 24px; }
+.pf-coll .srow-info { gap: 0; padding-top: 0; }
+.pf-coll .srow-thumb { width: 70px; height: 70px; }
 .pf-coll .srow-thumb > img { border-radius: 5px; }
-.pf-coll .srow-t { font: 700 17px/1.2 var(--f-body); }
-.pf-coll .srow-a { margin-top: 4px; color: #FFFFFF; font: 500 15px/1.25 var(--f-body); }
-.pf-coll .rchip { margin-top: 7px; }
-.pf-coll .srow-play { width: 44px; height: 69px; margin-right: 10px; color: #848388; align-self: center; }
+.pf-coll .srow-t { margin-top: .94px; font: 600 18.3px/1.158 var(--f-body); }
+.pf-coll .srow-a { margin-top: 3.87px; color: #FFFFFF; font: 600 14.3px/1.25 var(--f-body); letter-spacing: -.01em; }
+.pf-coll .rchip, .pf-coll .rchip.rchip-epic { margin-top: 5.76px; height: 23.33px; gap: 3.9px; padding: 0 8px; font: 600 11.25px/1 var(--f-body); }
+.pf-coll .rchip-i svg, .pf-coll .rchip:not(.rchip-epic) .rchip-i svg { width: 10px; height: 10px; }
+.pf-coll .srow-play { width: 44px; height: 69px; margin-right: 10.7px; color: #848388; align-self: center; }
+.pf-coll .srow-play svg { width: 21.1px; height: 21.1px; }
 .pf-foot { margin: 4px 0 0; color: #848484; font: 500 13px/1.15 var(--f-body); text-align: center; }
 .pf-offers {
-  position: absolute; z-index: 3; left: 50%; bottom: calc(var(--sab) + 11px); width: 213px; height: 41px; margin-left: -106.5px;
+  position: absolute; z-index: 3; left: 50%; bottom: calc(var(--sab) + 10px); width: 213.3px; height: 42px; margin-left: -106.65px;
   border: 0; border-radius: 999px; background: #1CD055; color: #000000; font: 800 17px/1 var(--f-body);
   box-shadow: 0 8px 24px rgba(0,0,0,.4);
 }
@@ -1084,15 +1098,15 @@ button.scard:active, .lrow:active { opacity: .5; transition: none; }
 .pl-pick-no { color: #848484; font: 700 12px/1 var(--f-body); font-variant-numeric: tabular-nums; }
 .pl-pick-mus svg { width: 13px; height: 13px; display: block; color: #1CD055; }
 /* ---------- your theme song: under your name, like SoundMap's, measured from it ---------- */
-.pf-theme { position: relative; display: flex; align-items: center; gap: 6.7px; width: fit-content; max-width: 100%; margin: -4.4px 0 5px; padding: 8px 0 8px 10px;
-  border: 0; background: none; color: #FFFFFF; text-align: left; font: 600 14px/1.2 var(--f-body); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.pf-theme { position: relative; display: flex; align-items: center; gap: 5.9px; width: fit-content; max-width: 100%; margin: -4.4px 0 5px; padding: 8px 0 8px 10px;
+  border: 0; background: none; color: #FFFFFF; text-align: left; font: 600 13.4px/1.2 var(--f-body); cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .pf-theme .th-text { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pf-theme .th-chip { margin-left: 1px; }
 .pf-theme:active .th-text, .pf-theme:active .th-chip { opacity: .6; }
 .pf-panel.has-bg .pf-theme .th-text { text-shadow: 0 1px 4px rgba(0,0,0,.7); }
-.th-disc { position: relative; display: block; flex: none; width: 20px; height: 20px; border-radius: 50%; overflow: hidden; background: #2A2A2A; box-shadow: 0 0 0 .75px rgba(0,0,0,.6); will-change: transform; }
+.th-disc { position: relative; top: .67px; display: block; flex: none; width: 20px; height: 20px; border-radius: 50%; overflow: hidden; background: #2A2A2A; box-shadow: 0 0 0 .75px rgba(0,0,0,.6); will-change: transform; }
 .th-disc img { width: 100%; height: 100%; max-width: none; object-fit: cover; display: block; }
-.sc-chip.th-chip { flex: none; gap: 4px; height: 11.7px; padding: 0 6px 0 5.7px; color: #FFFFFF; font-size: 6.4px; }
+.sc-chip.th-chip { flex: none; gap: 3.9px; height: 12.73px; padding: 0 4.82px 0 5.3px; color: #FFFFFF; font-size: 7px; letter-spacing: 0; }
 .sc-chip.th-chip .sc-chip-i svg { width: 7px; height: 7px; }
 .th-notes { position: absolute; left: 20px; top: 50%; width: 0; height: 0; pointer-events: none; z-index: 3; }
 .th-notes.big { left: 50%; }
@@ -6164,7 +6178,7 @@ function rarityChip(r) {
     keepPhase(chip, CHIP_HUE_MS);
     return chip;
   }
-  return h("span", { class: "rchip r" + r }, h("span", { class: "rchip-dot" }), RARITY[r].name);
+  return h("span", { class: "rchip r" + r }, h("span", { class: "rchip-i", html: HERO_ICON.gemC }), RARITY[r].name);
 }
 function rowThumb(k, n, all) {
   // SoundMap puts the white bubble only on a #1 copy; the market shows every copy's number (all)
@@ -6385,6 +6399,8 @@ const AURA_STOPS = [[0, "#FF4B2B"], [27, "#FF4B2B"], [45, "#FF4FD8"], [63, "#244
 const HERO_ICON = {
   back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4.5 7.5 12l7.5 7.5"/></svg>',
   gem: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l4.2 5.2L12 20.5 2.8 9.2z" fill="#F6F8FC" stroke="#2B3240" stroke-width="1.6" stroke-linejoin="round"/><path d="M2.8 9.2h18.4M9.6 4 8 9.2l4 11.3 4-11.3L14.4 4" fill="none" stroke="#8D97AA" stroke-width="1.2" stroke-linejoin="round"/></svg>',
+  // the same gem in the rarity's own color, for Common, Uncommon, Rare and Shiny chips (SoundMap puts a gem on every chip)
+  gemC: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l4.2 5.2L12 20.5 2.8 9.2z" fill="currentColor"/><path d="M2.8 9.2h18.4M9.6 4 8 9.2l4 11.3 4-11.3L14.4 4" fill="none" stroke="#000" stroke-opacity=".3" stroke-width="1.4" stroke-linejoin="round"/></svg>',
   notes: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 17.5V5.8l10.5-2v11.4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.3" cy="17.6" r="2.9" fill="currentColor"/><circle cx="16.8" cy="15.4" r="2.9" fill="currentColor"/></svg>',
   play: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 5.2v13.6L19.5 12z" fill="currentColor" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></svg>',
   sliders: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg>',
@@ -7669,10 +7685,10 @@ function renderQuests() {
 // songs; then Achievements, Artist Badges, Showcase, Favorite Artists, Playlists and Collection, and an Offers
 // button floating at the bottom. Your own GIF, photo or video can sit behind it all.
 const PF_ICON = {
-  star: '<svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="pfStarG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6F8FB"/><stop offset="1" stop-color="#9DAABB"/></linearGradient></defs><path d="M12 1.6l3.1 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.4 5.6 21l1.5-7.1L1.7 9l7.2-.8z" fill="url(#pfStarG)" stroke="#7C899B" stroke-width=".9" stroke-linejoin="round"/><path d="M12 1.6v15.8L5.6 21l1.5-7.1L1.7 9l7.2-.8z" fill="#FFFFFF" opacity=".35"/></svg>',
-  brush: '<svg viewBox="0 0 24 24" aria-hidden="true"><g transform="rotate(45 12 12)"><rect x="9.3" y="1.2" width="5.4" height="7.8" rx="1.4" fill="#F4EFE7"/><rect x="8.9" y="8.6" width="6.2" height="3.1" rx=".5" fill="#A7B1BE"/><path d="M9.8 11.6h4.4l-.7 9.6a1.5 1.5 0 0 1-3 0z" fill="#E7A157"/></g></svg>',
-  disc: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.6" fill="#D5DDE7"/><path d="M12 12h10.6a10.6 10.6 0 0 1-5.3 9.2z" fill="#3D8CDD"/><circle cx="12" cy="12" r="4.2" fill="#F5F7FA"/><circle cx="12" cy="12" r="1.9" fill="#2A323D"/></svg>',
-  note: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3.5v11.3a3.6 3.6 0 1 0 2.2 3.3V8.4l5.6 1.9V6.2z" fill="#4C4C4C"/></svg>',
+  star: '<svg class="pfi-star" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="pfStarG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6F8FB"/><stop offset="1" stop-color="#9DAABB"/></linearGradient></defs><path d="M12 1.6l3.1 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.4 5.6 21l1.5-7.1L1.7 9l7.2-.8z" fill="url(#pfStarG)" stroke="#7C899B" stroke-width=".9" stroke-linejoin="round"/><path d="M12 1.6v15.8L5.6 21l1.5-7.1L1.7 9l7.2-.8z" fill="#FFFFFF" opacity=".35"/></svg>',
+  brush: '<svg class="pfi-brush" viewBox="0 0 24 24" aria-hidden="true"><g transform="rotate(45 12 12)"><rect x="6.9" y="1.2" width="10.2" height="8.6" rx="1.7" fill="#EEF1F5"/><rect x="13.2" y="1.2" width="3.9" height="8.6" rx="1.2" fill="#CDD4DD"/><rect x="7.3" y="9.2" width="9.4" height="3.4" rx=".6" fill="#F2C584"/><path d="M9.4 12.4h5.2l-.55 8.1a2.05 2.05 0 0 1-4.1 0z" fill="#E29A4C"/><circle cx="12" cy="19.7" r=".95" fill="#1B1B1B"/></g></svg>',
+  disc: '<svg class="pfi-disc" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.6" fill="#D5DDE7"/><path d="M12 12h10.6a10.6 10.6 0 0 1-5.3 9.2z" fill="#3D8CDD"/><circle cx="12" cy="12" r="4.2" fill="#F5F7FA"/><circle cx="12" cy="12" r="1.9" fill="#2A323D"/></svg>',
+  note: '<svg class="pfi-note" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3.5v11.3a3.6 3.6 0 1 0 2.2 3.3V8.4l5.6 1.9V6.2z" fill="#4C4C4C"/></svg>',
   tile: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4.6l11-2.2v13.2a3.1 3.1 0 1 1-2-2.9V6.9l-7 1.4v9.4a3.1 3.1 0 1 1-2-2.9z" fill="currentColor"/></svg>',
   chev: '<svg class="pf-chev" viewBox="0 0 9 14" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.6 1.5 7 7l-5.4 5.5"/></svg>',
 };
@@ -8167,7 +8183,7 @@ function openProfileEditor() {
 // A song can also be Big (boxier, half a row) or Wide (a whole row), like SoundMap's; the small ones never change.
 // Tap the header to customize it. The case is kept between redraws of the profile, so the videos don't restart.
 // =====================================================================
-const SC_SPARK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 3.5l1.55 4.6a3 3 0 0 0 1.9 1.9l4.6 1.55-4.6 1.55a3 3 0 0 0-1.9 1.9L9.5 19.6 7.95 15a3 3 0 0 0-1.9-1.9L1.45 11.55l4.6-1.55a3 3 0 0 0 1.9-1.9z" fill="#FFC21A"/><path d="M18.6 2l.75 2.2a1.4 1.4 0 0 0 .9.9l2.2.75-2.2.75a1.4 1.4 0 0 0-.9.9l-.75 2.2-.75-2.2a1.4 1.4 0 0 0-.9-.9l-2.2-.75 2.2-.75a1.4 1.4 0 0 0 .9-.9z" fill="#FFDB6E"/><path d="M18.2 15.6l.5 1.45a1 1 0 0 0 .6.6l1.45.5-1.45.5a1 1 0 0 0-.6.6l-.5 1.45-.5-1.45a1 1 0 0 0-.6-.6l-1.45-.5 1.45-.5a1 1 0 0 0 .6-.6z" fill="#FFDB6E"/></svg>';
+const SC_SPARK = '<svg class="pfi-spark" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="scSpG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFC93A"/><stop offset="1" stop-color="#F7A11A"/></linearGradient></defs><path d="M15.00 0.60C15.96 5.56 16.64 6.24 21.60 7.20C16.64 8.16 15.96 8.84 15.00 13.80C14.04 8.84 13.36 8.16 8.40 7.20C13.36 6.24 14.04 5.56 15.00 0.60Z" fill="url(#scSpG)"/><path d="M5.60 8.30C6.23 11.53 6.67 11.97 9.90 12.60C6.67 13.23 6.23 13.67 5.60 16.90C4.97 13.67 4.53 13.23 1.30 12.60C4.53 11.97 4.97 11.53 5.60 8.30Z" fill="#FFE36B"/><path d="M12.60 16.60C13.11 19.15 13.45 19.49 16.00 20.00C13.45 20.51 13.11 20.85 12.60 23.40C12.09 20.85 11.75 20.51 9.20 20.00C11.75 19.49 12.09 19.15 12.60 16.60Z" fill="#FFE36B"/></svg>';
 let scEl = null, scSig = "", scIO = null, scSlots = [];
 const featuredCards = () => state.featured.map(id => state.cards.find(c => c.id === id)).filter(Boolean).slice(0, SHOWCASE_MAX);
 const scSizeOf = id => state.scSize[id] === "b" || state.scSize[id] === "w" ? state.scSize[id] : "s";
