@@ -10,8 +10,8 @@
 <meta name="apple-mobile-web-app-title" content="Cratewalk">
 <meta name="theme-color" content="#131313">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-180.png">
-<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png?v=2">
+<link rel="icon" type="image/png" href="icon-192.png?v=2">
 <style>html{background:#131313;color-scheme:dark}body{margin:0;background:#131313;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <script>
 window.CRATEWALK_STANDALONE = true;
@@ -284,7 +284,8 @@ button.sc-head:active { opacity: .4; }
 .sc-empty { margin: 0; color: #9B9B9F; font-size: 14px; line-height: 1.45; display: grid; gap: 12px; justify-items: start; }
 .sc-empty p { margin: 0; }
 /* Three small cards across on a phone, four or six on wider screens. The grid has twice that many columns: a small
-   card takes two (so it's exactly as wide as it always was), a big one three, a wide one the whole row. */
+   card takes two (so it's exactly as wide as it always was), a big one three and a wide one six (on a phone, half
+   the row and the whole row: SoundMap's shapes). */
 .sc-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; --per: 3; }
 @container (min-width: 540px) { .sc-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); --per: 4; } }
 @container (min-width: 760px) { .sc-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); --per: 6; } }
@@ -439,9 +440,10 @@ button.sc-head:active { opacity: .4; }
 .aura-opt.match.on { background: var(--raise); box-shadow: inset 0 0 0 1.5px #FFFFFF; }
 /* the song page uses the same chips as the lists: SoundMap's gem, color and dark tint */
 .hchip-rar { color: var(--rc); background: color-mix(in srgb, var(--rc) 16%, #121212); }
-.hchip-rar.r0 { color: #00C400; background: #112912; }
-.hchip-rar.r1 { color: #8A2FFF; background: #241731; }
-.hchip-rar.r2 { color: #FF7B00; background: #312214; }
+.hchip-rar.r0 { color: #00CC00; background: #123012; }
+.hchip-rar.r1 { color: #9537FF; background: #291A39; }
+.hchip-rar.r2 { color: #FF8700; background: #392612; }
+.hchip-rar.r3 { color: #FFFFFF; background: linear-gradient(100deg, #121D28, #111F3F); }
 .hchip-dot { width: 2.2cqw; height: 2.2cqw; border-radius: 50%; background: rgba(0,0,0,.55); }
 /* A dark wash of the glow's color over the blurred picture, like SoundMap's green and purple pages. */
 .sheet-bg.tint::before { content: ""; position: absolute; inset: 0; z-index: 1; background: var(--tint); opacity: .84; }
@@ -481,15 +483,18 @@ button.sc-head:active { opacity: .4; }
 .srow-main:active, .srow-play:active { opacity: .4; }
 .rchip { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 10px 0 8px; border-radius: 999px; font: 700 12px/1 var(--f-body); white-space: nowrap; color: var(--rc); background: color-mix(in srgb, var(--rc) 16%, transparent); }
 .rchip-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-/* SoundMap's colors for these chips: grass green, violet and orange on their own dark tints */
-.rchip.r0 { color: #00C400; background: #112912; }
-.rchip.r1 { color: #8A2FFF; background: #241731; }
-.rchip.r2 { color: #FF7B00; background: #312214; }
+/* SoundMap's colors for these chips (read off its Filters sheet and song lists): grass green, violet and orange
+   on their own dark tints, and Shiny's white on a slate-to-navy blend */
+.rchip.r0 { color: #00CC00; background: #123012; }
+.rchip.r1 { color: #9537FF; background: #291A39; }
+.rchip.r2 { color: #FF8700; background: #392612; }
+.rchip.r3 { color: #FFFFFF; background: linear-gradient(100deg, #121D28, #111F3F); }
 .rchip-i svg.gem { overflow: visible; }
 svg.gem { overflow: visible; }
 svg.gem-c { filter: drop-shadow(0 0 .7px rgba(40,240,140,.6)); }
 svg.gem-u { filter: drop-shadow(0 0 .6px rgba(240,90,240,.45)); }
 svg.gem-r { filter: drop-shadow(0 0 .8px rgba(255,130,60,.45)); }
+svg.gem-s { filter: drop-shadow(0 0 .6px rgba(255,255,255,.45)); }
 .svg-defs { position: absolute; width: 0; height: 0; overflow: hidden; pointer-events: none; }
 .rchip-i svg { width: 13px; height: 13px; display: block; }
 .rchip:not(.rchip-epic) .rchip-i svg { width: 11px; height: 11px; }
@@ -560,7 +565,9 @@ svg.gem-r { filter: drop-shadow(0 0 .8px rgba(255,130,60,.45)); }
 .pf-panel.has-bg .pf-card, .pf-panel.has-bg .showcase { background: rgba(27,27,27,.84); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
 .pf-panel.has-bg .pf-tile { background: rgba(21,21,21,.8); }
 .pf-panel.has-bg .pf-name b { text-shadow: 0 1px 6px rgba(0,0,0,.55); }
-.pf-panel.has-bg .pf-line, .pf-panel.has-bg .pf-foot { color: #D2D2D2; text-shadow: 0 1px 4px rgba(0,0,0,.7); }
+.pf-panel.has-bg .pf-foot { color: #D2D2D2; text-shadow: 0 1px 4px rgba(0,0,0,.7); }
+/* over a background SoundMap's line under your name turns white */
+.pf-panel.has-bg .pf-line { color: #FFFFFF; text-shadow: 0 1px 4px rgba(0,0,0,.7); }
 .pf-panel.has-bg .pf-ava { box-shadow: 0 2px 10px rgba(0,0,0,.35); }
 .pf-top {
   position: relative; z-index: 2; flex: none; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box;
@@ -583,10 +590,18 @@ svg.gem-r { filter: drop-shadow(0 0 .8px rgba(255,130,60,.45)); }
 .pf-name { display: flex; align-items: center; gap: 6px; min-width: 0; }
 .pf-name b { min-width: 0; font: 800 20.5px/1.2 var(--f-body); color: #FFFFFF; letter-spacing: -.005em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pf-mini { width: 22px; height: 22px; flex: none; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 1.5px #F2C230; }
-.pf-line { display: flex; align-items: center; gap: 15px; color: #848484; font: 600 13.4px/1.2 var(--f-body); letter-spacing: -.01em; white-space: nowrap; }
-.pf-li { display: inline-flex; align-items: center; gap: 5px; }
+.pf-line { position: relative; top: 1.9px; display: flex; align-items: center; color: #848484; font: 700 13px/1.2 var(--f-body); letter-spacing: 0; white-space: nowrap; }
+.pf-li { display: inline-flex; align-items: center; }
 .pf-emo { font-size: 14px; line-height: 1; }
-.pf-li svg { width: 14px; height: 14px; display: block; }
+/* Each picture sits in a box of its own width with the words a fixed step after it, so the words land where
+   SoundMap's do whatever the phone's emoji measure; the crown and the record are 0.707 of the Achievements' 21pt
+   ones, as on SoundMap. */
+.pf-ico { flex: none; display: inline-flex; justify-content: center; align-items: center; }
+.pf-li .pf-emo { font-size: 14.85px; line-height: 1; }
+.li-coin .pf-ico { width: 13.6px; margin-right: 4.5px; }
+.li-coin .pf-ico svg { position: relative; top: -.6px; width: 13.6px; height: 12.36px; display: block; }
+.li-lv { margin-left: 14.4px; } .li-lv .pf-ico { width: 16px; margin-right: 5.3px; }
+.li-cd { margin-left: 15.9px; } .li-cd .pf-ico { width: 17px; margin-right: 4.7px; }
 .pf-card { background: #1B1B1B; border-radius: 20px; margin-bottom: 16px; color: #FFFFFF; }
 .pf-ch { display: flex; align-items: center; gap: 5px; box-sizing: border-box; height: 52px; padding: .8px 15px 0 17px; color: #848484; font: 600 15.3px/1.2 var(--f-body); letter-spacing: -.005em; }
 /* the headers with "See all" sit a point lower, like SoundMap's */
@@ -776,6 +791,40 @@ button.pf-ch:active, button.pf-fav:active, button.pf-pl:active { opacity: .4; }
   display: grid; gap: 16px; grid-auto-rows: max-content; align-content: start;
 }
 .sheet h2 { font: 800 26px/1.1 var(--f-display); margin: 0; padding-right: 44px; text-wrap: balance; }
+/* ---------- Filters, laid out like SoundMap's sheet: a title with two round buttons, the chips in one dark panel,
+   and a big green Confirm. Sizes are SoundMap's on a 428-point-wide iPhone. ---------- */
+#sheet[data-page="filters"] { background: #121212; border-radius: 24px 24px 0 0; }
+#sheet[data-page="filters"] > .sheet-grab, #sheet[data-page="filters"] > .sheet-close { display: none; }
+#sheet[data-page="filters"] > .sheet-body { gap: 0; padding: 32px max(20px, env(safe-area-inset-right, 0px)) 10px max(20px, env(safe-area-inset-left, 0px)); }
+@media (min-width: 720px) {
+  #sheet[data-page="filters"] { border-radius: 24px; }
+  #sheet[data-page="filters"] > .sheet-body { padding-bottom: 20px; }
+}
+.flt-head { display: flex; align-items: center; gap: 8px; height: 34px; }
+.sheet h2.flt-title { flex: 1; min-width: 0; padding: 0 0 0 1px; color: #FFFFFF; font: 800 20px/1 var(--f-body); letter-spacing: 0; }
+.flt-btn { flex: none; display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 50%; background: #1D1D1D; color: #FFFFFF; }
+.flt-btn svg { display: block; width: 14px; height: 14px; }
+.flt-btn.flt-x svg { width: 12.7px; height: 12.7px; overflow: visible; }
+.flt-btn[aria-pressed="true"] { background: #FFFFFF; color: #121212; }
+.flt-btn:active { opacity: .6; }
+.flt-panel { margin-top: 16px; padding: 28px 18px; border-radius: 16px; background: #1A1A1A; }
+.flt-h { margin: 23px 0 12px; color: #8F8F94; font: 700 14px/1 var(--f-body); }
+.flt-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.flt-chip { flex: none; box-sizing: border-box; display: inline-flex; align-items: center; height: 30px; margin: 0; padding: 0 11px 0 10px; border: 0; border-radius: 15px; font: 600 13.5px/1 var(--f-body); letter-spacing: 0; white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: opacity .15s; }
+.flt-chip.flt-g { gap: 6.2px; padding-right: 10.6px; color: var(--gt); background: var(--gb); }
+.flt-chip.flt-g .flt-chip-i svg { display: block; width: 13px; height: 14.77px; overflow: visible; }
+.flt-chip.flt-s { color: #FFFFFF; background: #373737; }
+.flt-panel .rchip { height: 30px; gap: 4px; padding: 0 10.5px 0 10px; font: 600 13.5px/1 var(--f-body); }
+.flt-panel .rchip.r2 { letter-spacing: -.35px; }
+.flt-panel .rchip:not(.rchip-epic) .rchip-i svg { width: 14px; height: 14px; }
+.flt-panel .rchip.r3 .rchip-i svg { width: 13px; height: 13px; }
+.flt-panel .rchip.rchip-epic .rchip-i svg { width: 16px; height: 16px; }
+/* a picked chip gets a white ring; once a row has a pick, the chips left out of it fade back */
+.flt-chip[aria-pressed="true"] { outline: 2px solid #FFFFFF; outline-offset: 2px; }
+.flt-chips.some .flt-chip[aria-pressed="false"] { opacity: .38; }
+.flt-chip:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; }
+.flt-confirm { display: block; width: 100%; height: 54px; margin-top: 24px; border: 0; border-radius: 27px; background: #1ED760; color: #121212; font: 800 18px/1 var(--f-body); }
+.flt-confirm:active { opacity: .75; }
 .kv { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 13px; }
 .kv dt { color: var(--ink-2); font-weight: 600; }
 .kv dd { margin: 0; font-weight: 700; text-align: right; min-width: 0; overflow-wrap: anywhere; }
@@ -1122,13 +1171,13 @@ button.pf-ch:active, button.pf-fav:active, button.pf-pl:active { opacity: .4; }
 .pl-pick-no { color: #848484; font: 700 12px/1 var(--f-body); font-variant-numeric: tabular-nums; }
 .pl-pick-mus svg { width: 13px; height: 13px; display: block; color: #1CD055; }
 /* ---------- your theme song: under your name, like SoundMap's, measured from it ---------- */
-.pf-theme { position: relative; display: flex; align-items: center; gap: 5.9px; width: fit-content; max-width: 100%; margin: -4.4px 0 5px; padding: 8px 0 8px 10px;
-  border: 0; background: none; color: #FFFFFF; text-align: left; font: 600 13.4px/1.2 var(--f-body); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.pf-theme { position: relative; display: flex; align-items: center; gap: 5.9px; width: fit-content; max-width: 100%; margin: -5.1px 0 4px; padding: 8px 0 8px 10px;
+  border: 0; background: none; color: #FFFFFF; text-align: left; font: 600 13px/1.2 var(--f-body); letter-spacing: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .pf-theme .th-text { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pf-theme .th-chip { margin-left: 1px; }
+.pf-theme .th-chip { margin-left: -.2px; }
 .pf-theme:active .th-text, .pf-theme:active .th-chip { opacity: .4; }
 .pf-panel.has-bg .pf-theme .th-text { text-shadow: 0 1px 4px rgba(0,0,0,.7); }
-.th-disc { position: relative; top: .67px; display: block; flex: none; width: 20px; height: 20px; border-radius: 50%; overflow: hidden; background: #2A2A2A; box-shadow: 0 0 0 .75px rgba(0,0,0,.6); will-change: transform; }
+.th-disc { position: relative; top: -.08px; display: block; flex: none; width: 20px; height: 20px; border-radius: 50%; overflow: hidden; background: #2A2A2A; box-shadow: 0 0 0 .75px rgba(0,0,0,.6); will-change: transform; }
 .th-disc img { width: 100%; height: 100%; max-width: none; object-fit: cover; display: block; }
 .sc-chip.th-chip { flex: none; gap: 3.9px; height: 12.73px; padding: 0 4.82px 0 5.3px; color: #FFFFFF; font-size: 7px; letter-spacing: 0; }
 .sc-chip.th-chip .sc-chip-i svg { width: 7px; height: 7px; }
@@ -1676,17 +1725,17 @@ const ICON = {
 // =====================================================================
 // Catalog: real songs, original card art. Rarity tier is fixed per song.
 // =====================================================================
-// chip: [text, background] for the genre chip on the song page. Hip Hop is SoundMap's exact orange on brown;
-// the others are the same light-on-dark look worked out from each genre's own colour.
+// chip: [text, background] for the genre's chip (the song page, Filters), in SoundMap's own colours, read off its
+// Filters sheet. tag: the name SoundMap's filter chip gives the genre.
 const GENRES = {
-  hiphop: { name: "Hip Hop", color: "#F26B1D", chip: ["#F88631", "#502200"] },
-  pop: { name: "Pop", color: "#FF4FA3", chip: ["#F562A4", "#531833"] },
-  rnb: { name: "R&B / Soul", color: "#8B6CF0", chip: ["#A088FF", "#322757"] },
-  indie: { name: "Indie", color: "#14A89A", chip: ["#00E2CF", "#003A34"] },
-  rock: { name: "Rock", color: "#D7263D", chip: ["#FE6369", "#57181B"] },
-  electronic: { name: "Electronic", color: "#E3B505", chip: ["#EEBE00", "#3D2F00"] },
-  latin: { name: "Latin", color: "#3FA34D", chip: ["#63E474", "#033D0F"] },
-  kpop: { name: "K-Pop", color: "#2E8BFF", chip: ["#579FFF", "#143157"] },
+  hiphop: { name: "Hip Hop", tag: "Hiphop", color: "#F26B1D", chip: ["#F88631", "#502200"] },
+  pop: { name: "Pop", tag: "Pop", color: "#FF4FA3", chip: ["#0277FF", "#001C3D"] },
+  rnb: { name: "R&B / Soul", tag: "R&B", color: "#8B6CF0", chip: ["#11E7DC", "#004B47"] },
+  indie: { name: "Indie", tag: "Indie", color: "#14A89A", chip: ["#34D691", "#124A2F"] },
+  rock: { name: "Rock", tag: "Rock", color: "#D7263D", chip: ["#E107E6", "#4B1E4C"] },
+  electronic: { name: "Electronic", tag: "Electronic", color: "#E3B505", chip: ["#F7000F", "#3E0205"] },
+  latin: { name: "Latin", tag: "Latin", color: "#3FA34D", chip: ["#FFD9CA", "#FF4500"] },
+  kpop: { name: "K-Pop", tag: "K-Pop", color: "#2E8BFF", chip: ["#EFFF23", "#4C510C"] },
 };
 const CATALOG = [
   ["hiphop", "Kendrick Lamar", ["HUMBLE.", "Alright", "Money Trees", "Not Like Us", "DNA.", "luther"]],
@@ -2133,8 +2182,8 @@ const LS_KEY = "cratewalk.save.v2", LS_KEY_OLD = "cratewalk.save.v1";
 // The Home Screen copy of the game (outside claude.ai) sets this before the game loads.
 const STANDALONE = !!window.CRATEWALK_STANDALONE;
 const MAX_CARDS = 1500;   // cards a save keeps one by one; vault Epics don't count toward it
-const SHOWCASE_MAX = 12;  // songs on your profile's showcase
-// How a showcase song looks: small (the tall card; the default), "b" big (boxier, half a row) or "w" wide (a whole row).
+const SHOWCASE_MAX = 20;  // songs on your profile's showcase
+// How a showcase song looks: small (the tall card; the default), "b" big (SoundMap's boxy half row) or "w" wide (a whole row).
 const SC_SIZES = ["s", "b", "w"];
 const newDaily = () => ({ day: dayKey(), opened: 0, rarePlus: 0, dist: 0, trades: 0, claimed: {} });
 function newState() {
@@ -6536,7 +6585,7 @@ function playlistChooser(k) {
 
 // =====================================================================
 // Customizing your showcase: pick songs from your Epics (or anything in your crate), put them in order, and
-// give each one a size, like SoundMap's: Small (the tall card, which never changes), Big (boxier, half a row)
+// give each one a size, like SoundMap's: Small (the tall card, which never changes), Big (boxy, half a row)
 // or Wide (a whole row). Every size is as tall as a small card.
 // =====================================================================
 const SC_SIZE_NAMES = { s: "Small", b: "Big", w: "Wide" };
@@ -6547,31 +6596,16 @@ const SC_ICON = {
   w: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1.5" y="6.5" width="21" height="11" rx="2"/></svg>',
 };
 // A phone shows three small cards across: six columns, two for a small card, three for a big one and all six for
-// a wide one (8 and 12 columns where four or six small cards fit across). When a row has room left over, its
-// big cards stretch to fill it. Small cards always keep their size.
-function scSpans(sizes, per) {
-  const U = per * 2, need = { s: 2, b: 3, w: U }, out = [];
-  let row = [], used = 0;
-  const close = () => {
-    const free = U - used, bigs = row.filter(i => sizes[i] === "b");
-    if (free > 0 && bigs.length) bigs.forEach((i, j) => { out[i] += Math.floor(free / bigs.length) + (j < free % bigs.length ? 1 : 0); });
-    row = []; used = 0;
-  };
-  sizes.forEach((z, i) => {
-    const n = Math.min(need[z] || 2, U);
-    if (used + n > U) close();
-    out[i] = n; row.push(i); used += n;
-  });
-  close();
-  return out;
-}
+// a wide one (8 and 12 columns where four or six small cards fit across). Each size keeps SoundMap's shape
+// exactly: a big card is always half a phone's row (as wide as one and a half small cards) and a wide one always
+// a phone's whole row (three small cards), on any screen. A card that doesn't fit beside the ones before it starts
+// the next row. Small cards always keep their size.
+const SC_SPAN = { s: 2, b: 3, w: 6 };
 // The grid: each big or wide card carries how many columns it takes at each screen width (--s3, --s4, --s6).
 function scGrid(feat, slots, preview) {
-  const sizes = feat.map(c => scSizeOf(c.id));
-  const sp = { 3: scSpans(sizes, 3), 4: scSpans(sizes, 4), 6: scSpans(sizes, 6) };
-  return h("div", { class: "sc-grid" }, feat.map((c, i) => {
-    const el = showcaseCard(c, slots, preview);
-    if (sizes[i] !== "s") { el.style.setProperty("--s3", sp[3][i]); el.style.setProperty("--s4", sp[4][i]); el.style.setProperty("--s6", sp[6][i]); }
+  return h("div", { class: "sc-grid" }, feat.map(c => {
+    const el = showcaseCard(c, slots, preview), z = scSizeOf(c.id);
+    if (z !== "s") for (const p of ["--s3", "--s4", "--s6"]) el.style.setProperty(p, SC_SPAN[z]);
     return el;
   }));
 }
@@ -6612,7 +6646,7 @@ function openShowcaseEditor(o) {
     add.addEventListener("click", e => showAdd(e));
     acts.replaceChildren(add, h("span", { class: "sce-count", text: `${feat.length} of ${SHOWCASE_MAX}` }));
     list.replaceChildren(...feat.map((c, i) => sceRow(c, i, act)));
-    foot.replaceChildren(feat.length ? h("p", { class: "hint", text: "Drag the handle to change the order. Tap a size, or a song in the preview, to switch between Small, Big and Wide. A row fits three small songs, two big ones or one wide one; a big song stretches to fill its row when nothing else fits beside it." }) : "");
+    foot.replaceChildren(feat.length ? h("p", { class: "hint", text: "Drag the handle to change the order. Tap a size, or a song in the preview, to switch between Small, Big and Wide. Every size keeps SoundMap's shape: a row fits three small songs, two big ones or one wide one." }) : "");
   };
   const showAdd = e => panel.show("Add to your showcase", scPicker(paint), e && e.currentTarget, paint, !!e && e.detail === 0);
   dragSort(list, (from, to) => act.move(from, to, false), ".sce-row");
@@ -8800,11 +8834,12 @@ function cardEl(c, opts) {
 // A song as a row, the way SoundMap lists songs: cover with the copy number on its corner, title, artist,
 // rarity, and a play button (your music for the song, otherwise the song on Spotify).
 // SoundMap's rarity gems: a green emerald for Common, a pink-purple round cut for Uncommon, a framed square for Rare
-// (gradients come from the shared <defs> at the top of the page). Shiny keeps the plain gem in its own color.
+// (gradients come from the shared <defs> at the top of the page), and a silver step-cut diamond for Shiny.
 const RARITY_GEM = {
   0: '<svg class="gem gem-c" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.80 0.50 L12.00 0.50 L12.00 4.60 L8.10 8.40 L3.60 8.00 Z" fill="#78EBB1"/><path d="M12.00 0.50 L15.20 0.50 L20.40 8.00 L15.90 8.40 L12.00 4.60 Z" fill="#48EC9B"/><path d="M3.60 8.00 L8.10 8.40 L8.10 16.20 L3.60 16.80 Z" fill="#0A9A50"/><path d="M20.40 8.00 L20.40 16.80 L15.90 16.20 L15.90 8.40 Z" fill="#03A055"/><path d="M3.60 16.80 L8.10 16.20 L12.00 20.80 L12.00 23.50 L8.80 23.50 Z" fill="#30D281"/><path d="M12.00 20.80 L15.90 16.20 L20.40 16.80 L15.20 23.50 L12.00 23.50 Z" fill="#15CD75"/><path d="M12.00 4.60 L15.90 8.40 L15.90 16.20 L12.00 20.80 L8.10 16.20 L8.10 8.40 Z" fill="url(#gmCt)"/><path d="M12.00 4.60 L15.90 8.40 L15.90 16.20 L12.00 20.80 L8.10 16.20 L8.10 8.40 Z" fill="none" stroke="#C2FFE2" stroke-width=".95" stroke-linejoin="round"/><path d="M12.00 0.50 L12.00 4.60" stroke="#C2FFE2" stroke-width="0.90" stroke-linecap="round" fill="none"/><path d="M12.00 20.80 L12.00 23.50" stroke="#C2FFE2" stroke-width="0.90" stroke-linecap="round" fill="none"/><path d="M8.10 8.40 L3.60 8.00" stroke="#C2FFE2" stroke-width="0.90" stroke-linecap="round" fill="none"/><path d="M15.90 8.40 L20.40 8.00" stroke="#C2FFE2" stroke-width="0.90" stroke-linecap="round" fill="none"/><path d="M8.10 16.20 L3.60 16.80" stroke="#C2FFE2" stroke-width="0.90" stroke-linecap="round" fill="none"/><path d="M15.90 16.20 L20.40 16.80" stroke="#C2FFE2" stroke-width="0.90" stroke-linecap="round" fill="none"/><path d="M8.80 0.50 L15.20 0.50 L20.40 8.00 L20.40 16.80 L15.20 23.50 L8.80 23.50 L3.60 16.80 L3.60 8.00 Z" fill="none" stroke="#0A5A30" stroke-width=".9" stroke-linejoin="round"/></svg>',
   1: '<svg class="gem gem-u" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.50 1.00 L17.50 1.00 L23.00 6.90 L23.00 15.70 L17.30 23.00 L6.70 23.00 L1.00 15.70 L1.00 6.90 Z" fill="#A8229F"/><path d="M6.50 1.00 L17.50 1.00 L14.82 5.40 L9.18 5.40 Z" fill="#C426BB"/><path d="M6.50 1.00 L9.18 5.40 L6.56 8.16 L1.00 6.90 Z" fill="#F59CF4"/><path d="M17.50 1.00 L23.00 6.90 L17.44 8.16 L14.82 5.40 Z" fill="#FBA4FB"/><path d="M1.00 6.90 L6.56 8.16 L6.36 12.75 L1.00 15.70 Z" fill="url(#gmUs)"/><path d="M23.00 6.90 L23.00 15.70 L17.64 12.75 L17.44 8.16 Z" fill="url(#gmUs)"/><path d="M1.00 15.70 L6.36 12.75 L8.00 17.80 L6.70 23.00 Z" fill="#A2259C"/><path d="M23.00 15.70 L17.30 23.00 L16.00 17.80 L17.64 12.75 Z" fill="#7A167C"/><path d="M8.00 17.80 L16.00 17.80 L17.30 23.00 L6.70 23.00 Z" fill="#E051D6"/><path d="M8.00 17.80 L16.00 17.80 L17.30 23.00 L6.70 23.00 Z" fill="none" stroke="#FFC4FB" stroke-width=".8" stroke-linejoin="round"/><circle cx="12.00" cy="10.70" r="6.00" fill="url(#gmUt)" stroke="#FFCCFE" stroke-width="1.05"/><path d="M6.50 1.00 L9.18 5.40" stroke="#8E1488" stroke-width="0.80" stroke-linecap="round" fill="none"/><path d="M17.50 1.00 L14.82 5.40" stroke="#8E1488" stroke-width="0.80" stroke-linecap="round" fill="none"/><path d="M1.00 6.90 L6.56 8.16" stroke="#FFB5FD" stroke-width="0.75" stroke-linecap="round" fill="none"/><path d="M23.00 6.90 L17.44 8.16" stroke="#FFB5FD" stroke-width="0.75" stroke-linecap="round" fill="none"/><path d="M1.00 15.70 L6.36 12.75" stroke="#FFB5FD" stroke-width="0.75" stroke-linecap="round" fill="none"/><path d="M23.00 15.70 L17.64 12.75" stroke="#FFB5FD" stroke-width="0.75" stroke-linecap="round" fill="none"/><path d="M6.50 1.00 L17.50 1.00 L23.00 6.90 L23.00 15.70 L17.30 23.00 L6.70 23.00 L1.00 15.70 L1.00 6.90 Z" fill="none" stroke="#7A0E80" stroke-width=".8" stroke-linejoin="round"/></svg>',
   2: '<svg class="gem gem-r" viewBox="0 0 24 24" aria-hidden="true"><rect x=".6" y=".6" width="22.8" height="22.8" rx="2.6" fill="#D44E1C" stroke="#9E3B17" stroke-width=".8"/><path d="M3.40 3.40 Q7.70 6.60 12.00 3.40 M12.00 3.40 Q16.30 6.60 20.60 3.40 M3.40 20.60 Q7.70 17.40 12.00 20.60 M12.00 20.60 Q16.30 17.40 20.60 20.60 M3.40 3.40 Q6.60 7.70 3.40 12.00 M3.40 12.00 Q6.60 16.30 3.40 20.60 M20.60 3.40 Q17.40 7.70 20.60 12.00 M20.60 12.00 Q17.40 16.30 20.60 20.60" fill="none" stroke="#FDC596" stroke-width="1.2" stroke-linecap="round"/><circle cx="3.40" cy="3.40" r="1.5" fill="none" stroke="#FDC596" stroke-width="1"/><circle cx="20.60" cy="3.40" r="1.5" fill="none" stroke="#FDC596" stroke-width="1"/><circle cx="3.40" cy="20.60" r="1.5" fill="none" stroke="#FDC596" stroke-width="1"/><circle cx="20.60" cy="20.60" r="1.5" fill="none" stroke="#FDC596" stroke-width="1"/><circle cx="12.00" cy="3.10" r="1.5" fill="none" stroke="#FDC596" stroke-width="1"/><circle cx="12.00" cy="20.90" r="1.5" fill="none" stroke="#FDC596" stroke-width="1"/><circle cx="3.10" cy="12.00" r="1.5" fill="none" stroke="#FDC596" stroke-width="1"/><circle cx="20.90" cy="12.00" r="1.5" fill="none" stroke="#FDC596" stroke-width="1"/><rect x="7.50" y="7.50" width="9.00" height="9.00" fill="url(#gmRt)"/><path d="M4.20 7.50 L19.80 7.50" stroke="#FFF6DC" stroke-width="1.00" stroke-linecap="round" fill="none"/><path d="M4.20 16.50 L19.80 16.50" stroke="#FFF6DC" stroke-width="1.00" stroke-linecap="round" fill="none"/><path d="M7.50 4.20 L7.50 19.80" stroke="#FFF6DC" stroke-width="1.00" stroke-linecap="round" fill="none"/><path d="M16.50 4.20 L16.50 19.80" stroke="#FFF6DC" stroke-width="1.00" stroke-linecap="round" fill="none"/></svg>',
+  3: '<svg class="gem gem-s" viewBox="0 0 24 24" aria-hidden="true"><g transform="rotate(45 12 12)"><rect x="4.3" y="4.3" width="15.4" height="15.4" rx="1.1" fill="#F2F2F4"/><path d="M6.3 6.6l1.7 1.6v7.6l-1.7 1.6z" fill="#C4C4C9"/><path d="M17.7 6.6l-1.7 1.6v7.6l1.7 1.6z" fill="#B2B2B8"/><path d="M8.6 8.6h6.8L8.6 15.4z" fill="#FBFBFC"/><path d="M15.4 8.6v6.8H8.6z" fill="#C9C9CE"/><path d="M15.4 12.2v3.2h-3.2z" fill="#A3A3A9"/><path d="M8.6 8.6h6.8v6.8H8.6z" fill="none" stroke="#B5B5BB" stroke-width=".5"/></g></svg>',
 };
 // The name on a rarity chip: SoundMap writes RARE in capitals and the others as words.
 const chipName = r => r === 2 ? "RARE" : RARITY[r].name;
@@ -10323,31 +10358,97 @@ function listingMood(L) {
 }
 
 // ---------- Trade ----------
-const tradeUI = { q: "", yours: false, rarity: "all", auction: false, faves: false, unowned: false, house: false };
+const tradeUI = { q: "", yours: false, genres: [], rars: [], sort: "new", auction: false, faves: false, unowned: false, house: false };
 function tradeLists() {
   const mine = myListings().map(L => ({ ...L, mine: true }));
   const others = (sharedOK && db) ? market.filter(L => L.status === "open" && L.seller !== myId) : [];
   const house = houseStock().filter(L => !state.houseBought[L.id]);
   return { mine, others, house };
 }
+// The Filters chip is green (with an x that clears it) while any genre, rarity or sort is picked.
+const tradeFiltered = () => tradeUI.genres.length > 0 || tradeUI.rars.length > 0 || tradeUI.sort !== "new";
 function renderTradeChips() {
-  const f = tradeUI.rarity !== "all";
+  const f = tradeFiltered();
   const chip = (label, on, fn, tail) => h("button", { type: "button", class: "tr-chip", "aria-pressed": String(on), onclick: fn }, label, tail || null);
   $("#tradeChips").replaceChildren(
-    chip("Filters", f, () => { if (f) { tradeUI.rarity = "all"; renderTrade(); } else openTradeFilters(); }, f ? h("span", { html: SM_ICON.x, style: "display:grid" }) : null),
+    chip("Filters", f, () => { if (f) { tradeUI.genres = []; tradeUI.rars = []; tradeUI.sort = "new"; renderTrade(); } else openTradeFilters(); }, f ? h("span", { html: SM_ICON.x, style: "display:grid" }) : null),
     chip("Auction", tradeUI.auction, () => { tradeUI.auction = !tradeUI.auction; renderTrade(); }),
     chip("Faves", tradeUI.faves, () => { tradeUI.faves = !tradeUI.faves; renderTrade(); }),
     chip("Unowned", tradeUI.unowned, () => { tradeUI.unowned = !tradeUI.unowned; renderTrade(); }),
     chip("House", tradeUI.house, () => { tradeUI.house = !tradeUI.house; renderTrade(); }));
 }
+const TRADE_SORTS = [["new", "Newest"], ["rarity", "Rarest"], ["low", "Lowest price"], ["high", "Highest price"]];
 function openTradeFilters() {
-  const opts = [["all", "Every rarity"], ...RARITY.map((r, i) => [String(i), r.name])];
-  openSheet([h("h2", { text: "Filters" }),
-    h("p", { class: "muted", style: "margin:0", text: "Show offers of one rarity." }),
-    h("div", { class: "rar-pick" }, opts.map(([v, label]) => h("button", {
-      type: "button", class: "rar-opt" + (v === "all" ? "" : " r" + v) + (tradeUI.rarity === v ? " on" : ""),
-      onclick: () => { tradeUI.rarity = v; closeSheet(); renderTrade(); },
-    }, v === "all" ? null : h("span", { class: "rar-dot" }), label)))], "Filters");
+  openFilters({ genres: tradeUI.genres, rars: tradeUI.rars, sort: tradeUI.sort, sorts: TRADE_SORTS,
+    onConfirm: (g, r, sort) => { tradeUI.genres = g; tradeUI.rars = r; tradeUI.sort = sort; renderTrade(); } });
+}
+
+// ---------- Filters: SoundMap's sheet. Genre chips and rarity chips in one dark panel, tap as many as you like,
+// then Confirm. Nothing picked in a row means all of that row. The sliders button shows the ways to sort the list.
+// The game's eight genres, in SoundMap's order.
+const FILTER_GENRES = ["pop", "hiphop", "indie", "kpop", "rock", "rnb", "latin", "electronic"];
+const FILTER_ICON = {
+  sliders: '<svg viewBox="0 0 14 11.33" aria-hidden="true"><path d="M.9 2.5h12.2M.9 8.83h12.2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><circle cx="5.1" cy="2.5" r="1.75" fill="#1D1D1D" stroke="currentColor" stroke-width="1.7"/><circle cx="8.9" cy="8.83" r="1.75" fill="#1D1D1D" stroke="currentColor" stroke-width="1.7"/></svg>',
+  x: '<svg viewBox="0 0 12.7 12.7" aria-hidden="true"><path d="M1.1 1.1l10.5 10.5M11.6 1.1 1.1 11.6" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg>',
+};
+// Does a song pass the picked genres and rarities? (empty lists let everything through)
+function passesFilters(c, genres, rars) {
+  if (rars.length && !rars.includes(rarityOf(c))) return false;
+  if (genres.length) { const s = SONG_BY_KEY.get(c.k); if (!s || !genres.includes(s.genre)) return false; }
+  return true;
+}
+// o: { genres, rars, sort, sorts: [[value, label]], onConfirm(genres, rars, sort) }
+function openFilters(o) {
+  const pick = { g: new Set(o.genres), r: new Set(o.rars), sort: o.sort || "new" };
+  let showSort = pick.sort !== "new";
+  const toggle = (set, v, b, row) => {
+    if (set.has(v)) set.delete(v); else set.add(v);
+    b.setAttribute("aria-pressed", String(set.has(v)));
+    row.classList.toggle("some", set.size > 0);
+  };
+  const gRow = h("div", { class: "flt-chips", role: "group", "aria-label": "Genre" });
+  for (const g of FILTER_GENRES) {
+    const G = GENRES[g];
+    const b = h("button", { type: "button", class: "flt-chip flt-g", "aria-pressed": String(pick.g.has(g)), style: `--gt:${G.chip[0]};--gb:${G.chip[1]}` },
+      h("span", { class: "flt-chip-i", html: HERO_ICON.notes }), G.tag);
+    b.addEventListener("click", () => toggle(pick.g, g, b, gRow));
+    gRow.append(b);
+  }
+  gRow.classList.toggle("some", pick.g.size > 0);
+  // the same chips as the song lists, at SoundMap's filter size (Epic just as it is everywhere else)
+  const rRow = h("div", { class: "flt-chips", role: "group", "aria-label": "Rarity" });
+  RARITY.forEach((_, r) => {
+    const b = h("button", { type: "button", class: "flt-chip rchip " + (r === 4 ? "rchip-epic" : "r" + r), "aria-pressed": String(pick.r.has(r)) },
+      h("span", { class: "rchip-i", html: r === 4 ? HERO_ICON.gem : RARITY_GEM[r] }), r === 4 ? "Epic" : chipName(r));
+    if (r === 4) keepPhase(b, CHIP_HUE_MS);
+    b.addEventListener("click", () => toggle(pick.r, r, b, rRow));
+    rRow.append(b);
+  });
+  rRow.classList.toggle("some", pick.r.size > 0);
+  const sRow = h("div", { class: "flt-chips some", role: "group", "aria-label": "Sort" });
+  const paintSort = () => { for (const b of sRow.children) b.setAttribute("aria-pressed", String(b.dataset.v === pick.sort)); };
+  for (const [v, label] of o.sorts || []) {
+    const b = h("button", { type: "button", class: "flt-chip flt-s", "data-v": v }, label);
+    b.addEventListener("click", () => { pick.sort = v; paintSort(); });
+    sRow.append(b);
+  }
+  paintSort();
+  const sortH = h("div", { class: "flt-h", text: "Sort" });
+  const sortBtn = h("button", { class: "flt-btn", type: "button", "aria-label": "Sort", "aria-pressed": String(showSort), html: FILTER_ICON.sliders });
+  const showSorts = () => { sortH.hidden = sRow.hidden = !showSort; sortBtn.setAttribute("aria-pressed", String(showSort)); };
+  sortBtn.addEventListener("click", () => { showSort = !showSort; showSorts(); });
+  if (!(o.sorts && o.sorts.length)) sortBtn.hidden = true;
+  showSorts();
+  const close = h("button", { class: "flt-btn flt-x", type: "button", "aria-label": "Close", "data-autofocus": "", html: FILTER_ICON.x, onclick: () => closeSheet() });
+  const confirm = h("button", { class: "flt-confirm", type: "button", text: "Confirm" });
+  confirm.addEventListener("click", () => {
+    const g = FILTER_GENRES.filter(x => pick.g.has(x)), r = RARITY.map((_, i) => i).filter(i => pick.r.has(i));
+    o.onConfirm(g, r, pick.sort);
+    closeSheet();
+  });
+  openSheet([h("div", { class: "flt-head" }, h("h2", { class: "flt-title", text: "Filters" }), sortBtn, close),
+    h("div", { class: "flt-panel" }, gRow, h("div", { class: "flt-h", text: "Rarity" }), rRow, sortH, sRow),
+    confirm], "Filters", null, { page: "filters" });
 }
 function renderTrade() {
   renderTradeChips();
@@ -10359,11 +10460,11 @@ function renderTrade() {
   const q = tradeUI.q.trim().toLowerCase();
   const owned = tradeUI.unowned ? new Set(state.cards.map(c => c.k)) : null;
   const faves = tradeUI.faves ? new Set(artistRanking().slice(0, 12).map(x => x.a.key)) : null;
-  const filtered = !!(q || owned || faves || tradeUI.auction || tradeUI.house || tradeUI.rarity !== "all");
+  const filtered = !!(q || owned || faves || tradeUI.auction || tradeUI.house || tradeUI.genres.length || tradeUI.rars.length);
   list = list.filter(L => {
     const s = SONG_BY_KEY.get(L.k);
     if (!s) return false;
-    if (tradeUI.rarity !== "all" && rarityOf(L) !== +tradeUI.rarity) return false;
+    if (!passesFilters(L, tradeUI.genres, tradeUI.rars)) return false;
     if (tradeUI.auction && !isAuction(L)) return false;
     if (tradeUI.house && !L.house) return false;
     if (owned && owned.has(L.k)) return false;
@@ -10371,6 +10472,10 @@ function renderTrade() {
     if (q && !(s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q))) return false;
     return true;
   });
+  // Sort from Filters (Newest keeps the feed's own order: yours, then players', then the House's)
+  if (tradeUI.sort === "rarity") list.sort((a, b) => rarityOf(b) - rarityOf(a) || b.price - a.price);
+  else if (tradeUI.sort === "low") list.sort((a, b) => a.price - b.price);
+  else if (tradeUI.sort === "high") list.sort((a, b) => b.price - a.price);
   const body = $("#tradeBody");
   body._fill = null;   // stops the last render's posts still on their way in
   if (!list.length) {
@@ -10540,7 +10645,7 @@ function myListingEl(L) {
 // ---------- New Offer and Auction: SoundMap's page for putting your songs up ----------
 let offerUI = null;
 function openOffer(auction) {
-  offerUI = { auction: !!auction, cid: null, note: "", price: "", q: "", filter: "all", sort: "new", tool: null, busy: false };
+  offerUI = { auction: !!auction, cid: null, note: "", price: "", q: "", genres: [], rars: [], sort: "new", tool: null, busy: false };
   $("#offerTitle").textContent = auction ? "Auction" : "New Offer";
   $("#page-offer").setAttribute("aria-label", auction ? "Auction" : "New Offer");
   $("#offerLabel").textContent = auction ? "Add a song to auction" : "Add songs to offer";
@@ -10595,15 +10700,10 @@ function renderOfferTools() {
   }
   const row = h("div", { class: "of-tools-row" },
     h("button", { class: "of-tool", type: "button", "aria-label": "Search your songs", "aria-pressed": String(!!u.q), html: SM_ICON.search, onclick: () => { u.tool = "search"; renderOfferTools(); } }),
-    h("button", { class: "of-fpill", type: "button", "aria-pressed": String(u.tool === "filters" || u.filter !== "all"), "aria-expanded": String(u.tool === "filters"), onclick: () => { u.tool = u.tool === "filters" ? null : "filters"; renderOfferTools(); } }, "Filters"),
+    h("button", { class: "of-fpill", type: "button", "aria-pressed": String(u.genres.length > 0 || u.rars.length > 0), "aria-haspopup": "dialog", onclick: () => openOfferFilters(u) }, "Filters"),
     h("button", { class: "of-tool", type: "button", "aria-label": "Sort", "aria-pressed": String(u.tool === "sort" || u.sort !== "new"), "aria-expanded": String(u.tool === "sort"), html: SM_ICON.sliders, onclick: () => { u.tool = u.tool === "sort" ? null : "sort"; renderOfferTools(); } }));
   let sub = null;
-  if (u.tool === "filters") {
-    sub = h("div", { class: "of-sub", role: "group", "aria-label": "Rarity" }, ["all", "0", "1", "2", "3", "4"].map(v => h("button", {
-      type: "button", class: "tr-chip" + (v === "all" ? "" : " r" + v), "aria-pressed": String(u.filter === v),
-      onclick: () => { u.filter = u.filter === v ? "all" : v; renderOfferTools(); renderOfferList(); },
-    }, v === "all" ? null : h("span", { class: "sw" }), v === "all" ? "All" : RARITY[+v].name)));
-  } else if (u.tool === "sort") {
+  if (u.tool === "sort") {
     sub = h("div", { class: "of-sub", role: "group", "aria-label": "Sort" }, [["new", "Newest"], ["rarity", "Rarest"], ["value", "Value"], ["artist", "Artist A–Z"]].map(([v, label]) => h("button", {
       type: "button", class: "tr-chip", "aria-pressed": String(u.sort === v),
       onclick: () => { u.sort = v; renderOfferTools(); renderOfferList(); },
@@ -10611,12 +10711,17 @@ function renderOfferTools() {
   }
   put(tools, row, sub);
 }
+const OFFER_SORTS = [["new", "Newest"], ["rarity", "Rarest"], ["value", "Value"], ["artist", "Artist A–Z"]];
+// New Offer's Filters pill opens the same SoundMap sheet as Trade's, for the songs you can pick from.
+function openOfferFilters(u) {
+  openFilters({ genres: u.genres, rars: u.rars, sort: u.sort, sorts: OFFER_SORTS,
+    onConfirm: (g, r, sort) => { if (offerUI !== u) return; u.genres = g; u.rars = r; u.sort = sort; renderOfferTools(); renderOfferList(); } });
+}
 function renderOfferList() {
   const u = offerUI, box = $("#offerList");
   if (!u) return;
   const q = u.q.trim().toLowerCase();
-  let list = state.cards.filter(c => c.id !== u.cid);
-  if (u.filter !== "all") list = list.filter(c => rarityOf(c) === +u.filter);
+  let list = state.cards.filter(c => c.id !== u.cid && passesFilters(c, u.genres, u.rars));
   if (q) list = list.filter(c => { const s = SONG_BY_KEY.get(c.k); return s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q); });
   list.sort(CRATE_SORTS[u.sort] || CRATE_SORTS.new);
   if (!list.length) { put(box, h("p", { class: "of-more", text: state.cards.length > (u.cid ? 1 : 0) ? "No songs match." : "Your collection is empty. Open drops on the map first." })); return; }
@@ -10806,13 +10911,15 @@ const PF_ICON = {
   chev: '<svg class="pf-chev" viewBox="0 0 9 14" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.6 1.5 7 7l-5.4 5.5"/></svg>',
 };
 // SoundMap's coin is pixel art: a gold coin with a dollar sign.
-const PF_COIN = (() => {
-  const rows = ["..oooooo..", ".oYYYYYYo.", "oYYYddYYYo", "oYYddddYYo", "oYYddYYYYo", "oYYYdddYYo", "oYYYYYddYo", "oYYddddYYo", ".oYYddYYo.", "..oooooo.."];
+const pixelCoin = rows => {
   const col = { o: "#C46A00", Y: "#FFC21A", d: "#E08F00" };
   let r = "";
   rows.forEach((row, y) => [...row].forEach((ch, x) => { if (col[ch]) r += `<rect x="${x}" y="${y}" width="1.04" height="1.04" fill="${col[ch]}"/>`; }));
-  return `<svg viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;
-})();
+  return `<svg viewBox="0 0 ${rows[0].length} ${rows.length}" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;
+};
+const PF_COIN = pixelCoin(["..oooooo..", ".oYYYYYYo.", "oYYYddYYYo", "oYYddddYYo", "oYYddYYYYo", "oYYYdddYYo", "oYYYYYddYo", "oYYddddYYo", ".oYYddYYo.", "..oooooo.."]);
+// under your name it's SoundMap's shape exactly: eleven pixels across and ten down, 13.6 by 12.4 points
+const PF_COIN_LINE = pixelCoin(["...ooooo...", "..oYYYYYo..", ".oYYYdYYYo.", ".oYYddddYo.", "oYYdYdYYYYo", "oYYYdddYYYo", ".oYYYdYdYo.", ".oYddddYYo.", "..oYYdYYo..", "...ooooo..."]);
 // 6,700 -> 6.7K, 228,014 -> 228K
 function fmtK(n) {
   n = Math.max(0, Math.round(n || 0));
@@ -11196,9 +11303,9 @@ function renderMe() {
       h("div", { class: "pf-name" }, h("b", { text: name }), pinnedBadge() ? badgeEl(pinnedBadge(), { mini: true })
         : !state.badges.length && ranked[0] ? h("img", { class: "pf-mini", src: artistPic(ranked[0].a), alt: "", title: ranked[0].a.name }) : null),
       h("div", { class: "pf-line" },
-        h("span", { class: "pf-li", title: "Coins" }, h("span", { html: PF_COIN }), fmtN(state.coins)),
-        h("span", { class: "pf-li", title: "Level" }, h("span", { class: "pf-emo", text: "👑" }), `Lv. ${L}`),
-        h("span", { class: "pf-li", title: "Songs" }, h("span", { class: "pf-emo", text: "💿" }), fmtN(st.cards)))));
+        h("span", { class: "pf-li li-coin", title: "Coins" }, h("span", { class: "pf-ico", html: PF_COIN_LINE }), fmtN(state.coins)),
+        h("span", { class: "pf-li li-lv", title: "Level" }, h("span", { class: "pf-ico pf-emo", text: "👑" }), `Lv. ${L}`),
+        h("span", { class: "pf-li li-cd", title: "Songs" }, h("span", { class: "pf-ico pf-emo", text: "💿" }), fmtN(st.cards)))));
   const rank = myRank(st.score);
   const ach = h("div", { class: "pf-card" }, pfHead(PF_ICON.star, "Achievements", "chev", openAchievements),
     h("div", { class: "pf-ach" },
